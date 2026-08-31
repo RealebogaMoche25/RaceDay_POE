@@ -66,3 +66,40 @@ CREATE TABLE [USER]
 
 SELECT * FROM [USER];
 
+
+
+/* ============================================================
+   2. EVENT TABLE
+   ============================================================
+   Stores information about events created by Organisers.
+   Each event belongs to one Organiser.
+   Organiser is also a User in the system. The ROLE column
+   identifies whether that user is an Organiser.
+   */
+
+CREATE TABLE EVENT
+(
+    EVENT_ID INT IDENTITY(1,1) PRIMARY KEY,
+    -- Identifies the User who created/owns the event. This references USER.USER_ID.
+    ORGANISER_ID INT NOT NULL,
+    EVENT_NAME VARCHAR(100) NOT NULL,
+    DESCRIPTION VARCHAR(500),
+    EVENT_DATE DATE NOT NULL,
+    LOCATION VARCHAR(200) NOT NULL,
+    DISTANCE DECIMAL(6,2) NOT NULL,
+    EVENT_TYPE VARCHAR(20) NOT NULL,
+
+    -- Creates the relationship between EVENT and USER. ORGANISER_ID must exist as a USER_ID in USER.
+    CONSTRAINT FK_EVENT_ORGANISER
+        FOREIGN KEY (ORGANISER_ID)
+        REFERENCES [USER](USER_ID),
+
+    -- Restricts event types to the three types required by the RaceDay system.
+    CONSTRAINT CK_EVENT_TYPE
+        CHECK (EVENT_TYPE IN ('Run', 'Walk', 'Cycle'))
+);
+
+SELECT * FROM EVENT;
+
+
+
