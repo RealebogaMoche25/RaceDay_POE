@@ -233,8 +233,44 @@ CREATE TABLE ROUTE
 SELECT * FROM ROUTE;
 
 
+/* ============================================================
+   1. ALTER EVENT TABLE
+   ============================================================
 
+   Rename the existing EVENT attributes so that their names
+   exactly match the attributes shown in the ERD.
+   ============================================================ */
 
+-- Rename DESCRIPTION to EVENT_DESCRIPTION.
+EXEC sp_rename
+    'EVENT.DESCRIPTION',
+    'EVENT_DESCRIPTION',
+    'COLUMN';
 
+    SELECT * FROM EVENT;
+
+-- Rename LOCATION to EVENT_LOCATION.
+EXEC sp_rename
+    'EVENT.LOCATION',
+    'EVENT_LOCATION',
+    'COLUMN';
+
+-- Rename DISTANCE to EVENT_DISTANCE.
+EXEC sp_rename
+    'EVENT.DISTANCE',
+    'EVENT_DISTANCE',
+    'COLUMN';
+
+    /* ============================================================ 
+    ADD BANNER_IMAGE_URL TO EVENT 
+    ============================================================ 
+    
+    BANNER_IMAGE_URL stores the URL of the event banner image. 
+    The actual image will later be stored using Azure Blob Storage in Part 3. 
+    The database only needs to store the URL that allows the application to retrieve/display it. 
+    NULL is allowed because an event may initially be created without a banner image. 
+    ============================================================ */ 
+    ALTER TABLE EVENT 
+    ADD BANNER_IMAGE_URL VARCHAR(500) NULL; 
 
 
