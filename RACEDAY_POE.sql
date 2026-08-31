@@ -102,4 +102,31 @@ CREATE TABLE EVENT
 SELECT * FROM EVENT;
 
 
+/* ============================================================
+   3. CATEGORY TABLE
+   ============================================================
+   Stores the categories available for each event.
+   */
+
+CREATE TABLE CATEGORY
+(
+    CATEGORY_ID INT IDENTITY(1,1) PRIMARY KEY,
+    EVENT_ID INT NOT NULL,
+    CATEGORY_NAME VARCHAR(100) NOT NULL,
+    DESCRIPTION VARCHAR(255),
+
+    -- Creates the relationship between CATEGORY and EVENT.
+    CONSTRAINT FK_CATEGORY_EVENT
+        FOREIGN KEY (EVENT_ID)
+        REFERENCES EVENT(EVENT_ID)
+
+        -- If an event is deleted, its categories areautomatically deleted as well.
+        ON DELETE CASCADE
+);
+
+SELECT * FROM CATEGORY;
+
+
+
+
 
