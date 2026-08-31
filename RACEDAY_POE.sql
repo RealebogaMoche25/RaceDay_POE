@@ -269,8 +269,18 @@ EXEC sp_rename
     The actual image will later be stored using Azure Blob Storage in Part 3. 
     The database only needs to store the URL that allows the application to retrieve/display it. 
     NULL is allowed because an event may initially be created without a banner image. 
-    ============================================================ */ 
+    */ 
     ALTER TABLE EVENT 
     ADD BANNER_IMAGE_URL VARCHAR(500) NULL; 
 
+    /* ============================================================ 
+    2. ALTER CATEGORY TABLE 
+    ============================================================ 
+    Rename DESCRIPTION to CATEGORY_DESCRIPTION so that the attribute name matches the final ERD. 
+    ============================================================ */ 
+    EXEC sp_rename 
+    'CATEGORY.DESCRIPTION', 
+    'CATEGORY_DESCRIPTION', 
+    'COLUMN';
 
+    SELECT * FROM CATEGORY;
