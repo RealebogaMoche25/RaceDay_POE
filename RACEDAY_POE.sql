@@ -127,6 +127,60 @@ CREATE TABLE CATEGORY
 SELECT * FROM CATEGORY;
 
 
+/* ============================================================
+   4. ENROLMENT TABLE
+   ============================================================
+   Records when a Participant enters an Event.
+ An enrolment connects:
+   - A Participant
+   - An Event
+   - A selected Category
+PARTICIPANT_ID refers to USER_ID because a Participant
+   is also a User. The USER.ROLE column identifies the user
+   as a Participant.
+   ============================================================ */
+
+CREATE TABLE ENROLMENT
+(
+    ENROLMENT_ID INT IDENTITY(1,1) PRIMARY KEY,
+    -- Identifies the Participant who entered the event.
+    PARTICIPANT_ID INT NOT NULL,
+    -- Identifies the Event the Participant entered.
+    EVENT_ID INT NOT NULL,
+    -- Identifies the Category selected by the Participant.
+    CATEGORY_ID INT NOT NULL,
+    -- Shows the current status of the enrolment. New enrolments are Pending by default.
+    ENROLMENT_STATUS VARCHAR(20) NOT NULL DEFAULT 'Pending',
+    -- Automatically records when the enrolment was created.
+    ENROLMENT_DATE DATETIME NOT NULL DEFAULT GETDATE(),
+
+    -- Links the Participant to the USER table.
+    CONSTRAINT FK_ENROLMENT_PARTICIPANT
+        FOREIGN KEY (PARTICIPANT_ID)
+        REFERENCES [USER](USER_ID),
+
+    -- Links the enrolment to an EVENT.
+    CONSTRAINT FK_ENROLMENT_EVENT
+        FOREIGN KEY (EVENT_ID)
+        REFERENCES EVENT(EVENT_ID),
+
+    -- Links the enrolment to the selected CATEGORY.
+    CONSTRAINT FK_ENROLMENT_CATEGORY
+        FOREIGN KEY (CATEGORY_ID)
+        REFERENCES CATEGORY(CATEGORY_ID),
+
+    -- Restricts enrolment status to the approved values.
+    CONSTRAINT CK_ENROLMENT_STATUS
+        CHECK (ENROLMENT_STATUS IN
+        ('Pending', 'Confirmed', 'Cancelled'))
+);
+
+SELECT * FROM ENROLMENT;
+
+
+
+
+
 
 
 
