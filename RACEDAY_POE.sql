@@ -284,3 +284,14 @@ EXEC sp_rename
     'COLUMN';
 
     SELECT * FROM CATEGORY;
+
+    /* ============================================================ 
+    3. ALTER ROUTE TABLE 
+    ============================================================ 
+    Add ROUTE_URL to store the URL/reference for the route. 
+    This allows the RaceDay system to associate an event with an online route resource. 
+    ============================================================ */ 
+    ALTER TABLE ROUTE 
+    ADD ROUTE_URL VARCHAR(500) NULL;
+
+    SELECT* FROM ROUTE;
