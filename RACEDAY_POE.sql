@@ -207,6 +207,32 @@ CREATE TABLE RESULT
 SELECT * FROM RESULT;
 
 
+/* ============================================================
+   ROUTE TABLE
+   ============================================================
+   Stores route information associated with an event.
+   Each route belongs to one event.
+   The route can contain information such as the route name,
+   description and route details.
+   ============================================================ */
+
+CREATE TABLE ROUTE
+(
+    ROUTE_ID INT IDENTITY(1,1) PRIMARY KEY,
+    EVENT_ID INT NOT NULL,
+    ROUTE_NAME VARCHAR(100) NOT NULL,
+    ROUTE_DESCRIPTION VARCHAR(500),
+    ROUTE_LOCATION VARCHAR(255),
+
+    -- Creates the relationship between ROUTE and EVENT.
+    CONSTRAINT FK_ROUTE_EVENT
+        FOREIGN KEY (EVENT_ID)
+        REFERENCES EVENT(EVENT_ID)
+);
+
+SELECT * FROM ROUTE;
+
+
 
 
 
