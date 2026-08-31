@@ -177,6 +177,34 @@ CREATE TABLE ENROLMENT
 
 SELECT * FROM ENROLMENT;
 
+/* ============================================================
+   5. RESULT TABLE
+   ============================================================
+   Stores the result achieved by a Participant after
+   completing an event.
+   The result is connected to an ENROLMENT because the
+   Participant must first be enrolled in an event before
+   receiving a result.
+   ============================================================ */
+
+CREATE TABLE RESULT
+(
+    RESULT_ID INT IDENTITY(1,1) PRIMARY KEY,
+    ENROLMENT_ID INT NOT NULL,
+    FINISH_TIME TIME NOT NULL,
+    FINISHING_POSITION INT NOT NULL,
+
+    -- Links the result to the Participant's enrolment.
+    CONSTRAINT FK_RESULT_ENROLMENT
+        FOREIGN KEY (ENROLMENT_ID)
+        REFERENCES ENROLMENT(ENROLMENT_ID),
+
+    -- Ensures that finishing position cannot be zero or a negative number.
+    CONSTRAINT CK_RESULT_POSITION
+        CHECK (FINISHING_POSITION > 0)
+);
+
+SELECT * FROM RESULT;
 
 
 
