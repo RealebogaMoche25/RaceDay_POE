@@ -351,3 +351,24 @@ EXEC sp_rename
     
     SELECT * FROM ROUTE;
 
+
+    /* ============================================================ 
+    4. SAMPLE CATEGORIES 
+    ============================================================ 
+    Every event has categories available for participants. 
+    Event 1 has two categories. Event 2 has two categories. 
+    Event 3 has two categories. 
+    ============================================================ */ 
+    INSERT INTO CATEGORY ( EVENT_ID, CATEGORY_NAME, CATEGORY_DESCRIPTION ) 
+    VALUES -- Categories for Pretoria City Run 
+    ( 1, 'Senior 10KM', '10 kilometre category for senior participants.' ), 
+    ( 1, 'Under 20 10KM', '10 kilometre category for participants under 20.' ), 
+    -- Categories for Johannesburg Charity Walk 
+    ( 2, 'Open 5KM', 'Open 5 kilometre walking category.' ), 
+    ( 2, 'Senior 5KM', '5 kilometre walking category for senior participants.' ),
+    -- Categories for Gauteng Cycle Challenge 
+    ( 3, 'Open 50KM', 'Open category for the 50 kilometre cycling event.' ), 
+    ( 3, 'Junior 50KM', '50 kilometre category for junior cyclists.' ); 
+
+
+    SELECT * FROM CATEGORY;
