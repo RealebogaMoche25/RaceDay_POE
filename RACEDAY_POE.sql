@@ -337,5 +337,17 @@ EXEC sp_rename
             ( 5, 'Gauteng Cycle Challenge', 'A cycling challenge for recreational and competitive cyclists.', '2026-12-05', 'Centurion', 50.00, 'Cycle' ); 
 
     SELECT * FROM EVENT;
+
+
+    /* ============================================================ 
+    3. SAMPLE ROUTES 
+    ============================================================ 
+    Each event has a route. EVENT_ID establishes the relationship between the event and its route. 
+    ============================================================ */ 
+    INSERT INTO ROUTE ( EVENT_ID, ROUTE_NAME, ROUTE_DESCRIPTION, ROUTE_LOCATION ) 
+    VALUES  ( 1, 'Pretoria 10KM Route', 'A 10 kilometre road route through central Pretoria.', 'Pretoria'), 
+            ( 2, 'Johannesburg 5KM Walk Route', 'A 5 kilometre walking route through Johannesburg.', 'Johannesburg'), 
+            ( 3, 'Gauteng 50KM Cycle Route', 'A 50 kilometre cycling route through Centurion.', 'Centurion'); 
     
+    SELECT * FROM ROUTE;
 
