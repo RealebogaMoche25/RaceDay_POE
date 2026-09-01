@@ -295,3 +295,35 @@ EXEC sp_rename
     ADD ROUTE_URL VARCHAR(500) NULL;
 
     SELECT* FROM ROUTE;
+
+    SELECT * FROM [USER];
+    SELECT * FROM EVENT;
+    SELECT * FROM CATEGORY;
+    SELECT * FROM RESULT;
+    SELECT * FROM ENROLMENT;
+    SELECT * FROM ROUTE;
+
+    /* ============================================================ 
+    SAMPLE DATA / DATABASE SEEDING 
+    ============================================================ 
+    The following INSERT statements provide realistic sample data for testing the RaceDay system.
+    Minimum requirements satisfied: - 2 Organisers - 2 Participants - 3 Events 
+    - Categories for each event - Sample enrolments -
+    ============================================================ */ 
+    /* ============================================================ 
+    1. SAMPLE USERS 
+    ============================================================ 
+    Two Organisers and two Participants are created. 
+    The ROLE attribute determines whether the user is an Organiser or Participant. 
+    PASSWORD_HASH stores a hashed password rather than the user's original password. 
+    ============================================================ */ 
+    INSERT INTO [USER] (FIRST_NAME, LAST_NAME, EMAIL,PHONE_NUMBER, PASSWORD_HASH, ROLE) 
+    VALUES  ('Realeboga', 'Moche', 'rea.moche@gmail.com',0677046663, 'HASHED_PASSWORD_001', 'Organiser'), 
+            ('Wanga', 'Tshidada', 'wanga.tshidada@icloud.com',0712345678, 'HASHED_PASSWORD_002', 'Organiser'), 
+            ('Thato', 'Kekana', 'thato.kekana@gmail.com',0667048778, 'HASHED_PASSWORD_003', 'Participant'), 
+            ('Bonolo', 'Toka', 'bonolo.toka@icloud.com',NULL, 'HASHED_PASSWORD_004', 'Participant'); 
+
+    SELECT * FROM [USER];
+
+    
+
