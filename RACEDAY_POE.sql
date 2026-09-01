@@ -372,3 +372,19 @@ EXEC sp_rename
 
 
     SELECT * FROM CATEGORY;
+
+    /* ============================================================ 
+    5. SAMPLE ENROLMENTS 
+    ============================================================ 
+    Participants are enrolled in events by selecting a category. 
+    PARTICIPANT_ID identifies the participant. 
+    EVENT_ID identifies the event. 
+    CATEGORY_ID identifies the selected category. 
+    ============================================================ */ 
+    INSERT INTO ENROLMENT ( PARTICIPANT_ID, EVENT_ID, CATEGORY_ID, ENROLMENT_STATUS, ENROLMENT_DATE ) 
+    VALUES  ( 7, 1, 1, 'Confirmed', '2026-08-20' ), 
+            ( 8, 1, 2, 'Confirmed', '2026-08-21' ), 
+            ( 7, 2, 3, 'Confirmed', '2026-08-22' ), 
+            ( 8, 3, 5, 'Pending', '2026-08-23' ); 
+
+    SELECT * FROM ENROLMENT;
