@@ -325,5 +325,17 @@ EXEC sp_rename
 
     SELECT * FROM [USER];
 
+    /* ============================================================ 
+    2. SAMPLE EVENTS 
+    ============================================================ 
+    Three events are created. Each event contains the required information: 
+    - Name - Description - Date - Location - Distance - Event type, therefore every event must contain a value. 
+    ============================================================ */ 
+    INSERT INTO EVENT ( ORGANISER_ID, EVENT_NAME, EVENT_DESCRIPTION, EVENT_DATE, EVENT_LOCATION, EVENT_DISTANCE, EVENT_TYPE ) 
+    VALUES  ( 5, 'Pretoria City Run', 'A community road running event through Pretoria.', '2026-10-10', 'Pretoria', 10.00, 'Run'), 
+            ( 6, 'Johannesburg Charity Walk', 'A charity walking event supporting local communities.', '2026-11-14', 'Johannesburg', 5.00, 'Walk' ), 
+            ( 5, 'Gauteng Cycle Challenge', 'A cycling challenge for recreational and competitive cyclists.', '2026-12-05', 'Centurion', 50.00, 'Cycle' ); 
+
+    SELECT * FROM EVENT;
     
 
