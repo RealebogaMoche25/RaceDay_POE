@@ -388,3 +388,16 @@ EXEC sp_rename
             ( 8, 3, 5, 'Pending', '2026-08-23' ); 
 
     SELECT * FROM ENROLMENT;
+
+
+    /* ============================================================ 
+    6. SAMPLE RESULTS 
+    ============================================================ 
+    Results can be recorded after an event has been completed. 
+    These records demonstrate how finish times and finishing positions can be stored for enrolled participants. 
+    ============================================================ */ 
+    INSERT INTO RESULT ( ENROLMENT_ID, FINISH_TIME, FINISHING_POSITION ) 
+    VALUES ( 1, '01:02:35', 47 ), 
+           ( 2, '01:15:42', 82 ); 
+
+    SELECT * FROM RESULT;
