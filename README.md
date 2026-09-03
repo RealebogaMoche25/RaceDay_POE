@@ -82,19 +82,19 @@ The planned API includes 21 endpoints covering the main functionality required b
 
 ## Repository Structure
 The repository is organised to keep the project documentation and GitHub Actions workflow clearly separated.
-RaceDay_POE/
-│
-├── .github/
-│   └── workflows/
-│       └── repository-check.yml
-│
-├── Docs/
-│   ├── erdprog.drawio.png
-│   ├── PROG6212 PART 1.pdf
-│   └── RACEDAY_POE.sql
-│
-├── README.md
-└── RaceDay_POE.slnx
+- RaceDay_POE/
+- │
+- ├── .github/
+- │   └── workflows/
+- │       └── repository-check.yml
+- │
+- ├── Docs/
+- │   ├── erdprog.drawio.png
+- │   ├── PROG6212 PART 1.pdf
+- │   └── RACEDAY_POE.sql
+- │
+- ├── README.md
+- └── RaceDay_POE.slnx
 
 The .github/workflows directory contains the GitHub Actions workflow used to validate the repository.
 The Docs directory contains the required Part 1 documentation.
