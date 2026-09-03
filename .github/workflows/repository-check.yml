@@ -22,7 +22,3 @@ jobs:
 
           echo "All required Part 1 files are present."
           echo "RaceDay repository structure check passed successfully."
-          fi
-
-          echo "All required Part 1 files are present."
-          echo "RaceDay repository structure check passed successfully."
