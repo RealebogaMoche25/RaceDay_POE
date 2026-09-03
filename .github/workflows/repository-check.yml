@@ -24,7 +24,7 @@ jobs:
             exit 1
           fi
 
-          if [ ! -f "Docs/erdprog.drawio" ]; then
+          if [ ! -f "Docs/erdprog.drawio.png" ]; then
             echo "ERROR: ERD file is missing."
             exit 1
           fi
