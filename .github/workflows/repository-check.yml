@@ -29,8 +29,8 @@ jobs:
             exit 1
           fi
 
-          if [ ! -f "Docs/PROG6212 Part 1.pdf" ]; then
-            echo "ERROR: PROG6212 Part 1.pdf is missing."
+          if [ ! -f "Docs/PROG6212 PART 1.pdf" ]; then
+            echo "ERROR: PROG6212 PART 1.pdf is missing."
             exit 1
           fi
 
