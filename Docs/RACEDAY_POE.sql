@@ -1,8 +1,6 @@
-/* ============================================================
-   RACEDAY SYSTEM - PART 1
+/* RACEDAY SYSTEM - PART 1
    DATABASE SQL SCRIPT
-   ============================================================
-
+   ------------------------------------------------------------
    Purpose:
    This script creates the RaceDay database and the tables
    required for the RaceDay event management system.
@@ -14,35 +12,28 @@
    - Participant enrolments
    - Race results
 
-   NOTE:
    Passwords must be hashed by the application before they
    are stored in the PASSWORD_HASH column. The sample values
    below are placeholders for demonstration purposes.
-   ============================================================ */
+   ---------------------------------------------------------- */
 
 
-/* ============================================================
-   CREATE DATABASE
-   ============================================================
+-- CREATE DATABASE
 
-   Creates the RaceDay database that will store all information
-   related to users, events, categories, enrolments and results.
-   ============================================================ */
+        CREATE DATABASE RACEDAY_POE;
+        USE RACEDAY_POE;
 
-CREATE DATABASE RACEDAY_POE;
-USE RACEDAY_POE;
-
-/* ============================================================
-   1. USER TABLE
-   ============================================================
+/* USER TABLE
+   --------------------------------------------------------------
    Stores information about all users of the RaceDay system.
    Organisers and Participants are NOT stored in separate
    tables. Instead, both are stored as users and their role
    is identified using the ROLE column.
+   
    ROLE can only contain:
    - Organiser
    - Participant
-   */
+   -----------------------------------------------------------------*/
 
 CREATE TABLE [USER]
 (
@@ -68,14 +59,13 @@ SELECT * FROM [USER];
 
 
 
-/* ============================================================
-   2. EVENT TABLE
-   ============================================================
+/* EVENT TABLE
+   ------------------------------------------------------------
    Stores information about events created by Organisers.
    Each event belongs to one Organiser.
-   Organiser is also a User in the system. The ROLE column
-   identifies whether that user is an Organiser.
-   */
+   Organiser is also a User in the system. 
+   The ROLE column identifies whether that user is an Organiser.
+   --------------------------------------------------------------*/
 
 CREATE TABLE EVENT
 (
@@ -102,11 +92,10 @@ CREATE TABLE EVENT
 SELECT * FROM EVENT;
 
 
-/* ============================================================
-   3. CATEGORY TABLE
-   ============================================================
+/* CATEGORY TABLE
+   --------------------------------------------------------
    Stores the categories available for each event.
-   */
+   --------------------------------------------------------*/
 
 CREATE TABLE CATEGORY
 (
@@ -127,9 +116,8 @@ CREATE TABLE CATEGORY
 SELECT * FROM CATEGORY;
 
 
-/* ============================================================
-   4. ENROLMENT TABLE
-   ============================================================
+/* ENROLMENT TABLE
+   ---------------------------------------------------------------
    Records when a Participant enters an Event.
  An enrolment connects:
    - A Participant
@@ -138,7 +126,7 @@ SELECT * FROM CATEGORY;
 PARTICIPANT_ID refers to USER_ID because a Participant
    is also a User. The USER.ROLE column identifies the user
    as a Participant.
-   ============================================================ */
+  ---------------------------------------------------------------- */
 
 CREATE TABLE ENROLMENT
 (
@@ -177,15 +165,16 @@ CREATE TABLE ENROLMENT
 
 SELECT * FROM ENROLMENT;
 
-/* ============================================================
-   5. RESULT TABLE
-   ============================================================
+
+
+/* RESULT TABLE
+   ---------------------------------------------------------------
    Stores the result achieved by a Participant after
    completing an event.
    The result is connected to an ENROLMENT because the
    Participant must first be enrolled in an event before
    receiving a result.
-   ============================================================ */
+   --------------------------------------------------------------*/
 
 CREATE TABLE RESULT
 (
@@ -207,14 +196,13 @@ CREATE TABLE RESULT
 SELECT * FROM RESULT;
 
 
-/* ============================================================
-   ROUTE TABLE
-   ============================================================
+/* ROUTE TABLE
+   ------------------------------------------------------------
    Stores route information associated with an event.
    Each route belongs to one event.
    The route can contain information such as the route name,
    description and route details.
-   ============================================================ */
+   ------------------------------------------------------------*/
 
 CREATE TABLE ROUTE
 (
@@ -233,13 +221,11 @@ CREATE TABLE ROUTE
 SELECT * FROM ROUTE;
 
 
-/* ============================================================
-   1. ALTER EVENT TABLE
-   ============================================================
-
+/* ALTER EVENT TABLE
+   -------------------------------------------------------------
    Rename the existing EVENT attributes so that their names
    exactly match the attributes shown in the ERD.
-   ============================================================ */
+   ---------------------------------------------------------------*/
 
 -- Rename DESCRIPTION to EVENT_DESCRIPTION.
 EXEC sp_rename
@@ -261,23 +247,25 @@ EXEC sp_rename
     'EVENT_DISTANCE',
     'COLUMN';
 
-    /* ============================================================ 
-    ADD BANNER_IMAGE_URL TO EVENT 
-    ============================================================ 
+
+
+    /*  ADD BANNER_IMAGE_URL TO EVENT 
+    ----------------------------------------------------------------
     
     BANNER_IMAGE_URL stores the URL of the event banner image. 
     The actual image will later be stored using Azure Blob Storage in Part 3. 
     The database only needs to store the URL that allows the application to retrieve/display it. 
     NULL is allowed because an event may initially be created without a banner image. 
-    */ 
+    ----------------------------------------------------------------*/ 
     ALTER TABLE EVENT 
     ADD BANNER_IMAGE_URL VARCHAR(500) NULL; 
 
-    /* ============================================================ 
-    2. ALTER CATEGORY TABLE 
-    ============================================================ 
+
+
+    /*  ALTER CATEGORY TABLE 
+   -------------------------------------------------------------
     Rename DESCRIPTION to CATEGORY_DESCRIPTION so that the attribute name matches the final ERD. 
-    ============================================================ */ 
+    ------------------------------------------------------------*/ 
     EXEC sp_rename 
     'CATEGORY.DESCRIPTION', 
     'CATEGORY_DESCRIPTION', 
@@ -285,12 +273,11 @@ EXEC sp_rename
 
     SELECT * FROM CATEGORY;
 
-    /* ============================================================ 
-    3. ALTER ROUTE TABLE 
-    ============================================================ 
+    /* ALTER ROUTE TABLE 
+    -----------------------------------------------------------------
     Add ROUTE_URL to store the URL/reference for the route. 
     This allows the RaceDay system to associate an event with an online route resource. 
-    ============================================================ */ 
+    ----------------------------------------------------------------- */ 
     ALTER TABLE ROUTE 
     ADD ROUTE_URL VARCHAR(500) NULL;
 
@@ -303,20 +290,20 @@ EXEC sp_rename
     SELECT * FROM ENROLMENT;
     SELECT * FROM ROUTE;
 
-    /* ============================================================ 
-    SAMPLE DATA / DATABASE SEEDING 
-    ============================================================ 
+    /* SAMPLE DATA / DATABASE SEEDING 
+    --------------------------------------------------------------
     The following INSERT statements provide realistic sample data for testing the RaceDay system.
     Minimum requirements satisfied: - 2 Organisers - 2 Participants - 3 Events 
     - Categories for each event - Sample enrolments -
-    ============================================================ */ 
-    /* ============================================================ 
-    1. SAMPLE USERS 
-    ============================================================ 
+   ----------------------------------------------------------------- */ 
+
+
+    /* SAMPLE USERS 
+    -----------------------------------------------------------
     Two Organisers and two Participants are created. 
     The ROLE attribute determines whether the user is an Organiser or Participant. 
     PASSWORD_HASH stores a hashed password rather than the user's original password. 
-    ============================================================ */ 
+    ------------------------------------------------------------ */ 
     INSERT INTO [USER] (FIRST_NAME, LAST_NAME, EMAIL,PHONE_NUMBER, PASSWORD_HASH, ROLE) 
     VALUES  ('Realeboga', 'Moche', 'rea.moche@gmail.com',0677046663, 'HASHED_PASSWORD_001', 'Organiser'), 
             ('Wanga', 'Tshidada', 'wanga.tshidada@icloud.com',0712345678, 'HASHED_PASSWORD_002', 'Organiser'), 
@@ -325,12 +312,12 @@ EXEC sp_rename
 
     SELECT * FROM [USER];
 
-    /* ============================================================ 
-    2. SAMPLE EVENTS 
-    ============================================================ 
+
+    /* SAMPLE EVENTS 
+    -----------------------------------------------------------------
     Three events are created. Each event contains the required information: 
     - Name - Description - Date - Location - Distance - Event type, therefore every event must contain a value. 
-    ============================================================ */ 
+    ----------------------------------------------------------------- */ 
     INSERT INTO EVENT ( ORGANISER_ID, EVENT_NAME, EVENT_DESCRIPTION, EVENT_DATE, EVENT_LOCATION, EVENT_DISTANCE, EVENT_TYPE ) 
     VALUES  ( 5, 'Pretoria City Run', 'A community road running event through Pretoria.', '2026-10-10', 'Pretoria', 10.00, 'Run'), 
             ( 6, 'Johannesburg Charity Walk', 'A charity walking event supporting local communities.', '2026-11-14', 'Johannesburg', 5.00, 'Walk' ), 
@@ -339,11 +326,10 @@ EXEC sp_rename
     SELECT * FROM EVENT;
 
 
-    /* ============================================================ 
-    3. SAMPLE ROUTES 
-    ============================================================ 
+    /* 3. SAMPLE ROUTES 
+    -------------------------------------------------------------
     Each event has a route. EVENT_ID establishes the relationship between the event and its route. 
-    ============================================================ */ 
+   ------------------------------------------------------------- */ 
     INSERT INTO ROUTE ( EVENT_ID, ROUTE_NAME, ROUTE_DESCRIPTION, ROUTE_LOCATION ) 
     VALUES  ( 1, 'Pretoria 10KM Route', 'A 10 kilometre road route through central Pretoria.', 'Pretoria'), 
             ( 2, 'Johannesburg 5KM Walk Route', 'A 5 kilometre walking route through Johannesburg.', 'Johannesburg'), 
@@ -352,13 +338,12 @@ EXEC sp_rename
     SELECT * FROM ROUTE;
 
 
-    /* ============================================================ 
-    4. SAMPLE CATEGORIES 
-    ============================================================ 
+    /* SAMPLE CATEGORIES 
+    -------------------------------------------------------------
     Every event has categories available for participants. 
     Event 1 has two categories. Event 2 has two categories. 
     Event 3 has two categories. 
-    ============================================================ */ 
+    ------------------------------------------------------------- */ 
     INSERT INTO CATEGORY ( EVENT_ID, CATEGORY_NAME, CATEGORY_DESCRIPTION ) 
     VALUES -- Categories for Pretoria City Run 
     ( 1, 'Senior 10KM', '10 kilometre category for senior participants.' ), 
@@ -373,14 +358,13 @@ EXEC sp_rename
 
     SELECT * FROM CATEGORY;
 
-    /* ============================================================ 
-    5. SAMPLE ENROLMENTS 
-    ============================================================ 
+    /*SAMPLE ENROLMENTS 
+    ----------------------------------------------------------------
     Participants are enrolled in events by selecting a category. 
     PARTICIPANT_ID identifies the participant. 
     EVENT_ID identifies the event. 
     CATEGORY_ID identifies the selected category. 
-    ============================================================ */ 
+    ----------------------------------------------------------------*/ 
     INSERT INTO ENROLMENT ( PARTICIPANT_ID, EVENT_ID, CATEGORY_ID, ENROLMENT_STATUS, ENROLMENT_DATE ) 
     VALUES  ( 7, 1, 1, 'Confirmed', '2026-08-20' ), 
             ( 8, 1, 2, 'Confirmed', '2026-08-21' ), 
@@ -390,12 +374,11 @@ EXEC sp_rename
     SELECT * FROM ENROLMENT;
 
 
-    /* ============================================================ 
-    6. SAMPLE RESULTS 
-    ============================================================ 
+    /* SAMPLE RESULTS 
+    ------------------------------------------------------------ 
     Results can be recorded after an event has been completed. 
     These records demonstrate how finish times and finishing positions can be stored for enrolled participants. 
-    ============================================================ */ 
+    --------------------------------------------------------- */ 
     INSERT INTO RESULT ( ENROLMENT_ID, FINISH_TIME, FINISHING_POSITION ) 
     VALUES ( 1, '01:02:35', 47 ), 
            ( 2, '01:15:42', 82 ); 
