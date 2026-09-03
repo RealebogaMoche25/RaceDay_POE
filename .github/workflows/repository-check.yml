@@ -1,8 +1,6 @@
 name: RaceDay Repository CI
 
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
   repository-check:
@@ -39,6 +37,10 @@ jobs:
           if [ ! -f "Docs/RACEDAY_POE.sql" ]; then
             echo "ERROR: RACEDAY_POE.sql is missing."
             exit 1
+          fi
+
+          echo "All required Part 1 files are present."
+          echo "RaceDay repository structure check passed successfully."
           fi
 
           echo "All required Part 1 files are present."
