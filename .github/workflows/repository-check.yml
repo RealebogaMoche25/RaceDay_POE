@@ -1,8 +1,6 @@
 name: RaceDay Repository CI
 
-on:
-  push:
-  pull_request:
+on: [push, pull_request]
 
 jobs:
   repository-check:
@@ -10,36 +8,17 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Validate repository structure
         run: |
           echo "Checking RaceDay repository structure..."
 
-          if [ ! -d "Docs" ]; then
-            echo "ERROR: Docs folder is missing."
-            exit 1
-          fi
-
-          if [ ! -f "README.md" ]; then
-            echo "ERROR: README.md is missing."
-            exit 1
-          fi
-
-          if [ ! -f "Docs/erdprog.drawio" ]; then
-            echo "ERROR: ERD file is missing."
-            exit 1
-          fi
-
-          if [ ! -f "Docs/PROG6212 Part 1.pdf" ]; then
-            echo "ERROR: PROG6212 Part 1.pdf is missing."
-            exit 1
-          fi
-
-          if [ ! -f "Docs/RACEDAY_POE.sql" ]; then
-            echo "ERROR: RACEDAY_POE.sql is missing."
-            exit 1
-          fi
+          test -d "Docs" || { echo "ERROR: Docs folder is missing."; exit 1; }
+          test -f "README.md" || { echo "ERROR: README.md is missing."; exit 1; }
+          test -f "Docs/erdprog.drawio.png" || { echo "ERROR: ERD file is missing."; exit 1; }
+          test -f "Docs/PROG6212 PART 1.pdf" || { echo "ERROR: PROG6212 Part 1.pdf is missing."; exit 1; }
+          test -f "Docs/RACEDAY_POE.sql" || { echo "ERROR: RACEDAY_POE.sql is missing."; exit 1; }
 
           echo "All required Part 1 files are present."
           echo "RaceDay repository structure check passed successfully."
