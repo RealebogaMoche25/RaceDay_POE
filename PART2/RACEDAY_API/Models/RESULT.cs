@@ -11,7 +11,7 @@ namespace RACEDAY_API.Models
 
         public int FinishingPosition { get; set; }
 
-        public int EnrollmentId { get; set; }
+        public int EnrolmentId { get; set; }
 
     }
 }

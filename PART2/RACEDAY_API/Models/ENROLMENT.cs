@@ -7,9 +7,9 @@ namespace RACEDAY_API.Models
 
         public int EnrollmentId { get; set; }
 
-        public DateTime EnrollmentDate { get; set; }
+        public DateTime EnrolmentDate { get; set; }
 
-        public string EnrollmentStatus { get; set; }
+        public string EnrolmentStatus { get; set; }
 
         public int ParticipantId { get; set; }
 
