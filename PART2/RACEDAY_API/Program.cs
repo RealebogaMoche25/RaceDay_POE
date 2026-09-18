@@ -1,4 +1,4 @@
-using API_proj.Data;
+using RACEDAY_API.Data;
 using Microsoft.EntityFrameworkCore;
 
 
@@ -15,7 +15,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ApplicationDBContext>(options =>
 {
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection"))
+        builder.Configuration.GetConnectionString("DefaultConnection"));
     }
 );      
 
