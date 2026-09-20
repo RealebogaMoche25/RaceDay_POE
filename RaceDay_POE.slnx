@@ -1,6 +1,13 @@
 <Solution>
   <Configurations>
+    <BuildType Name="Debug" />
     <BuildType Name="Default" />
-    <Platform Name="Default" />
+    <BuildType Name="Release" />
   </Configurations>
+  <Project Path="PART2/RACEDAY_API.API.Test/RACEDAY_API.API.Test.csproj">
+    <BuildType Solution="Default|*" Project="Release" />
+  </Project>
+  <Project Path="PART2/RACEDAY_API/RACEDAY_API.csproj">
+    <BuildType Solution="Default|*" Project="Release" />
+  </Project>
 </Solution>
