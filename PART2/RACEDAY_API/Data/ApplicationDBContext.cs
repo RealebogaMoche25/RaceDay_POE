@@ -19,7 +19,7 @@ namespace RACEDAY_API.Data
 
         public DbSet<Result> Results { get; set; }
 
-        public DbSet<Routes> Routes { get; set; }
+        public DbSet<RACEDAY_API.Models.Route> Routes { get; set; }
 
     }
 }
