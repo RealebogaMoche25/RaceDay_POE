@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RACEDAY_API.Data;
+using System.Security.Claims;
 
 namespace RACEDAY_API.Controllers
 {
@@ -36,10 +38,32 @@ namespace RACEDAY_API.Controllers
         }
 
         // POST: api/routes
+        [Authorize(Roles = "Organiser")]
         [HttpPost]
         public IActionResult CreateRoute(
             RACEDAY_API.Models.Route newRoute)
         {
+            var eventItem = _context.Events.Find(newRoute.EventId);
+
+            if (eventItem == null)
+            {
+                return NotFound("Event not found.");
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
+            }
+
             _context.Routes.Add(newRoute);
             _context.SaveChanges();
 
@@ -50,6 +74,7 @@ namespace RACEDAY_API.Controllers
         }
 
         // PUT: api/routes/{id}
+        [Authorize(Roles = "Organiser")]
         [HttpPut("{id}")]
         public IActionResult UpdateRoute(
             int id,
@@ -62,11 +87,31 @@ namespace RACEDAY_API.Controllers
                 return NotFound();
             }
 
+            var eventItem = _context.Events.Find(route.EventId);
+
+            if (eventItem == null)
+            {
+                return NotFound("Event not found.");
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
+            }
+
             route.RouteName = updatedRoute.RouteName;
             route.RouteDescription = updatedRoute.RouteDescription;
             route.RouteUrl = updatedRoute.RouteUrl;
             route.RouteLocation = updatedRoute.RouteLocation;
-            route.EventId = updatedRoute.EventId;
 
             _context.SaveChanges();
 
@@ -74,6 +119,7 @@ namespace RACEDAY_API.Controllers
         }
 
         // DELETE: api/routes/{id}
+        [Authorize(Roles = "Organiser")]
         [HttpDelete("{id}")]
         public IActionResult DeleteRoute(int id)
         {
@@ -82,6 +128,27 @@ namespace RACEDAY_API.Controllers
             if (route == null)
             {
                 return NotFound();
+            }
+
+            var eventItem = _context.Events.Find(route.EventId);
+
+            if (eventItem == null)
+            {
+                return NotFound("Event not found.");
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
             }
 
             _context.Routes.Remove(route);
