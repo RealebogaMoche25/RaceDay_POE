@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RACEDAY_API.Data;
 using RACEDAY_API.Models;
+using System.Security.Claims;
 
 namespace RACEDAY_API.Controllers
 {
@@ -14,20 +16,28 @@ namespace RACEDAY_API.Controllers
             _context = context;
         }
 
-        // POST: api/events/{eventId}/enrolments
-        [HttpPost("api/events/{eventId}/enrolments")]
-        public IActionResult CreateEnrolment(
-            int eventId,
-            Enrolment newEnrolment)
+        // POST: api/enrolments
+        [Authorize(Roles = "Participant")]
+        [HttpPost("api/enrolments")]
+        public IActionResult CreateEnrolment(Enrolment newEnrolment)
         {
-            var eventItem = _context.Events.Find(eventId);
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int participantId = int.Parse(userIdClaim.Value);
+
+            var eventItem = _context.Events.Find(newEnrolment.EventId);
 
             if (eventItem == null)
             {
                 return NotFound("Event not found.");
             }
 
-            newEnrolment.EventId = eventId;
+            newEnrolment.ParticipantId = participantId;
             newEnrolment.EnrolmentDate = DateTime.Now;
             newEnrolment.EnrolmentStatus = "Active";
 
@@ -40,17 +50,29 @@ namespace RACEDAY_API.Controllers
                 newEnrolment);
         }
 
-        // GET: api/enrolments/my
-        [HttpGet("api/enrolments/my")]
+        // GET: api/enrolments/mine
+        [Authorize(Roles = "Participant")]
+        [HttpGet("api/enrolments/mine")]
         public IActionResult GetMyEnrolments()
         {
-            // Authentication/session logic will be added here.
-            // For now, return all enrolments for testing.
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
-            return Ok(_context.Enrolments.ToList());
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int participantId = int.Parse(userIdClaim.Value);
+
+            var enrolments = _context.Enrolments
+                .Where(e => e.ParticipantId == participantId)
+                .ToList();
+
+            return Ok(enrolments);
         }
 
         // GET: api/events/{eventId}/enrolments
+        [Authorize(Roles = "Organiser")]
         [HttpGet("api/events/{eventId}/enrolments")]
         public IActionResult GetEventEnrolments(int eventId)
         {
@@ -61,6 +83,20 @@ namespace RACEDAY_API.Controllers
                 return NotFound("Event not found.");
             }
 
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
+            }
+
             var enrolments = _context.Enrolments
                 .Where(e => e.EventId == eventId)
                 .ToList();
@@ -69,6 +105,7 @@ namespace RACEDAY_API.Controllers
         }
 
         // GET: api/enrolments/{id}
+        [Authorize]
         [HttpGet("api/enrolments/{id}")]
         public IActionResult GetEnrolment(int id)
         {
@@ -77,6 +114,37 @@ namespace RACEDAY_API.Controllers
             if (enrolment == null)
             {
                 return NotFound();
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            if (User.IsInRole("Participant"))
+            {
+                if (enrolment.ParticipantId != userId)
+                {
+                    return Forbid();
+                }
+            }
+            else if (User.IsInRole("Organiser"))
+            {
+                var eventItem = _context.Events.Find(enrolment.EventId);
+
+                if (eventItem == null)
+                {
+                    return NotFound("Event not found.");
+                }
+
+                if (eventItem.OrganiserId != userId)
+                {
+                    return Forbid();
+                }
             }
 
             return Ok(enrolment);
