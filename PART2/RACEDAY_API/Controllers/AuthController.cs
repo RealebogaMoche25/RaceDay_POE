@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Mvc;
 using RACEDAY_API.Data;
 using RACEDAY_API.Models;
+using System.Security.Claims;
 
 namespace RACEDAY_API.Controllers
 {
@@ -17,12 +20,12 @@ namespace RACEDAY_API.Controllers
 
         // POST: api/auth/register
         [HttpPost("register")]
-        public IActionResult Register(User newUser)
+        public IActionResult Register(RegisterDto newUser)
         {
             if (string.IsNullOrWhiteSpace(newUser.FirstName) ||
                 string.IsNullOrWhiteSpace(newUser.LastName) ||
                 string.IsNullOrWhiteSpace(newUser.Email) ||
-                string.IsNullOrWhiteSpace(newUser.PasswordHash) ||
+                string.IsNullOrWhiteSpace(newUser.Password) ||
                 string.IsNullOrWhiteSpace(newUser.Role))
             {
                 return BadRequest("All required fields must be provided.");
@@ -42,21 +45,41 @@ namespace RACEDAY_API.Controllers
                 return Conflict("Email already exists.");
             }
 
-            newUser.PasswordHash =
-                BCrypt.Net.BCrypt.HashPassword(newUser.PasswordHash);
+            var user = new User
+            {
+                FirstName = newUser.FirstName,
+                LastName = newUser.LastName,
+                Email = newUser.Email,
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.Password),
+                Role = newUser.Role,
+                PhoneNumber = newUser.PhoneNumber
+            };
 
-            _context.Users.Add(newUser);
+            _context.Users.Add(user);
             _context.SaveChanges();
 
-            newUser.PasswordHash = "";
-
-            return StatusCode(201, newUser);
+            return StatusCode(201, new
+            {
+                message = "Registration successful.",
+                userId = user.UserId,
+                firstName = user.FirstName,
+                lastName = user.LastName,
+                email = user.Email,
+                role = user.Role,
+                phoneNumber = user.PhoneNumber
+            });
         }
 
         // POST: api/auth/login
         [HttpPost("login")]
-        public IActionResult Login(User loginUser)
+        public async Task<IActionResult> Login(LoginDto loginUser)
         {
+            if (string.IsNullOrWhiteSpace(loginUser.Email) ||
+                string.IsNullOrWhiteSpace(loginUser.Password))
+            {
+                return BadRequest("Email and password are required.");
+            }
+
             var user = _context.Users
                 .FirstOrDefault(u => u.Email == loginUser.Email);
 
@@ -65,18 +88,31 @@ namespace RACEDAY_API.Controllers
                 return Unauthorized("Invalid email or password.");
             }
 
-            bool passwordValid =
-                BCrypt.Net.BCrypt.Verify(
-                    loginUser.PasswordHash,
-                    user.PasswordHash);
+            bool passwordValid = BCrypt.Net.BCrypt.Verify(
+                loginUser.Password,
+                user.PasswordHash);
 
             if (!passwordValid)
             {
                 return Unauthorized("Invalid email or password.");
             }
 
-            HttpContext.Session.SetInt32("UserId", user.UserId);
-            HttpContext.Session.SetString("Role", user.Role);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Name, user.Email),
+                new Claim(ClaimTypes.Role, user.Role)
+            };
+
+            var identity = new ClaimsIdentity(
+                claims,
+                CookieAuthenticationDefaults.AuthenticationScheme);
+
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme,
+                principal);
 
             return Ok(new
             {
@@ -91,14 +127,22 @@ namespace RACEDAY_API.Controllers
 
         // POST: api/auth/logout
         [HttpPost("logout")]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            HttpContext.Session.Clear();
+            await HttpContext.SignOutAsync(
+                CookieAuthenticationDefaults.AuthenticationScheme);
 
             return Ok(new
             {
                 message = "Logged out successfully."
             });
+        }
+
+        // GET: api/auth/access-denied
+        [HttpGet("access-denied")]
+        public IActionResult AccessDenied()
+        {
+            return StatusCode(403, "Access denied.");
         }
     }
 }
