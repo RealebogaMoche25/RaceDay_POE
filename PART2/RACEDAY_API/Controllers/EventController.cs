@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RACEDAY_API.Data;
 using RACEDAY_API.Models;
+using System.Security.Claims;
 
 namespace RACEDAY_API.Controllers
 {
@@ -16,6 +18,7 @@ namespace RACEDAY_API.Controllers
         }
 
         // GET: api/events
+        // Anyone can view events
         [HttpGet]
         public IActionResult GetEvents()
         {
@@ -23,6 +26,7 @@ namespace RACEDAY_API.Controllers
         }
 
         // GET: api/events/{id}
+        // Anyone can view a specific event
         [HttpGet("{id}")]
         public IActionResult GetEvent(int id)
         {
@@ -37,9 +41,22 @@ namespace RACEDAY_API.Controllers
         }
 
         // POST: api/events
+        // Only Organisers can create events
+        [Authorize(Roles = "Organiser")]
         [HttpPost]
         public IActionResult CreateEvent(Event newEvent)
         {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            newEvent.OrganiserId = organiserId;
+
             _context.Events.Add(newEvent);
             _context.SaveChanges();
 
@@ -50,6 +67,8 @@ namespace RACEDAY_API.Controllers
         }
 
         // PUT: api/events/{id}
+        // Only the Organiser who owns the event can update it
+        [Authorize(Roles = "Organiser")]
         [HttpPut("{id}")]
         public IActionResult UpdateEvent(int id, Event updatedEvent)
         {
@@ -60,6 +79,20 @@ namespace RACEDAY_API.Controllers
                 return NotFound();
             }
 
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
+            }
+
             eventItem.EventName = updatedEvent.EventName;
             eventItem.EventDescription = updatedEvent.EventDescription;
             eventItem.EventDate = updatedEvent.EventDate;
@@ -67,7 +100,6 @@ namespace RACEDAY_API.Controllers
             eventItem.EventDistance = updatedEvent.EventDistance;
             eventItem.EventType = updatedEvent.EventType;
             eventItem.BannerImageUrl = updatedEvent.BannerImageUrl;
-            eventItem.OrganiserId = updatedEvent.OrganiserId;
 
             _context.SaveChanges();
 
@@ -75,6 +107,8 @@ namespace RACEDAY_API.Controllers
         }
 
         // DELETE: api/events/{id}
+        // Only the Organiser who owns the event can delete it
+        [Authorize(Roles = "Organiser")]
         [HttpDelete("{id}")]
         public IActionResult DeleteEvent(int id)
         {
@@ -83,6 +117,20 @@ namespace RACEDAY_API.Controllers
             if (eventItem == null)
             {
                 return NotFound();
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
             }
 
             _context.Events.Remove(eventItem);
