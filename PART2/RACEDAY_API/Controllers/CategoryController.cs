@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RACEDAY_API.Data;
 using RACEDAY_API.Models;
+using System.Security.Claims;
 
 namespace RACEDAY_API.Controllers
 {
@@ -15,6 +17,7 @@ namespace RACEDAY_API.Controllers
         }
 
         // GET: api/events/{eventId}/categories
+        // Anyone can view categories
         [HttpGet("api/events/{eventId}/categories")]
         public IActionResult GetEventCategories(int eventId)
         {
@@ -33,6 +36,8 @@ namespace RACEDAY_API.Controllers
         }
 
         // POST: api/events/{eventId}/categories
+        // Only the Organiser who owns the event can create a category
+        [Authorize(Roles = "Organiser")]
         [HttpPost("api/events/{eventId}/categories")]
         public IActionResult CreateCategory(
             int eventId,
@@ -43,6 +48,20 @@ namespace RACEDAY_API.Controllers
             if (eventItem == null)
             {
                 return NotFound("Event not found.");
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
             }
 
             newCategory.EventId = eventId;
@@ -57,6 +76,7 @@ namespace RACEDAY_API.Controllers
         }
 
         // GET: api/categories/{id}
+        // Anyone can view a category
         [HttpGet("api/categories/{id}")]
         public IActionResult GetCategory(int id)
         {
@@ -71,6 +91,8 @@ namespace RACEDAY_API.Controllers
         }
 
         // PUT: api/categories/{id}
+        // Only the Organiser who owns the event can update the category
+        [Authorize(Roles = "Organiser")]
         [HttpPut("api/categories/{id}")]
         public IActionResult UpdateCategory(
             int id,
@@ -83,6 +105,27 @@ namespace RACEDAY_API.Controllers
                 return NotFound();
             }
 
+            var eventItem = _context.Events.Find(category.EventId);
+
+            if (eventItem == null)
+            {
+                return NotFound("Event not found.");
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
+            }
+
             category.CategoryName = updatedCategory.CategoryName;
             category.CategoryDescription = updatedCategory.CategoryDescription;
 
@@ -92,6 +135,8 @@ namespace RACEDAY_API.Controllers
         }
 
         // DELETE: api/categories/{id}
+        // Only the Organiser who owns the event can delete the category
+        [Authorize(Roles = "Organiser")]
         [HttpDelete("api/categories/{id}")]
         public IActionResult DeleteCategory(int id)
         {
@@ -100,6 +145,27 @@ namespace RACEDAY_API.Controllers
             if (category == null)
             {
                 return NotFound();
+            }
+
+            var eventItem = _context.Events.Find(category.EventId);
+
+            if (eventItem == null)
+            {
+                return NotFound("Event not found.");
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
             }
 
             _context.Categories.Remove(category);
