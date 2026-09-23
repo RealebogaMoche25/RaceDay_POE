@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using RACEDAY_API.Data;
 using RACEDAY_API.Models;
+using System.Security.Claims;
 
 namespace RACEDAY_API.Controllers
 {
     [Route("api/users")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
@@ -15,16 +18,18 @@ namespace RACEDAY_API.Controllers
             _context = context;
         }
 
-        // GET: api/users/profile
-        [HttpGet("profile")]
+        // GET: api/users/me
+        [HttpGet("me")]
         public IActionResult GetProfile()
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
-            if (userId == null)
+            if (userIdClaim == null)
             {
-                return Unauthorized("User is not logged in.");
+                return Unauthorized();
             }
+
+            int userId = int.Parse(userIdClaim.Value);
 
             var user = _context.Users.Find(userId);
 
@@ -45,16 +50,18 @@ namespace RACEDAY_API.Controllers
             });
         }
 
-        // PUT: api/users/profile
-        [HttpPut("profile")]
+        // PUT: api/users/me
+        [HttpPut("me")]
         public IActionResult UpdateProfile(User updatedUser)
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
-            if (userId == null)
+            if (userIdClaim == null)
             {
-                return Unauthorized("User is not logged in.");
+                return Unauthorized();
             }
+
+            int userId = int.Parse(userIdClaim.Value);
 
             var user = _context.Users.Find(userId);
 
