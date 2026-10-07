@@ -104,7 +104,7 @@ Docs/PROG6212 PART 1.pdf
 
 ## Repository Structure
 
-The repository is organised to keep the project documentation, Part 2 projects, automated tests, and GitHub Actions workflow clearly separated.
+The repository is organised to keep the project documentation, Part 2 projects, database script, automated tests, and GitHub Actions workflow clearly separated.
 
 * RaceDay_POE/
 * │
@@ -119,7 +119,8 @@ The repository is organised to keep the project documentation, Part 2 projects, 
 * │
 * ├── PART2/
 * │   ├── RACEDAY_API/
-* │   └── RACEDAY_API.API.Test/
+* │   ├── RACEDAY_API.API.Test/
+* │   └── RACEDAY_POE_PART2.sql
 * │
 * ├── README.md
 * └── RaceDay_POE.slnx
@@ -128,7 +129,7 @@ The .github/workflows directory contains the GitHub Actions workflow used to val
 
 The Docs directory contains the required Part 1 documentation.
 
-The PART2 directory contains the RaceDay ASP.NET Core Web API and automated unit testing project.
+The PART2 directory contains the RaceDay ASP.NET Core Web API, automated unit testing project, and Part 2 SQL database script.
 
 ## Setup and Run Instructions
 
@@ -163,7 +164,11 @@ The RACEDAY_API project is the startup project.
 
 Open SQL Server Management Studio (SSMS).
 
-Create or use the SQL Server instance configured for the project.
+Use the SQL script located at:
+
+PART2/RACEDAY_POE_PART2.sql
+
+The script contains the database setup for the RaceDay Part 2 database.
 
 The RaceDay Part 2 database is named:
 
@@ -318,7 +323,11 @@ A successful green build was completed using GitHub Actions.
 
 The screenshot below provides evidence of the successful build and automated test execution.
 
-**[INSERT NEW GREEN GITHUB ACTIONS BUILD SCREENSHOT HERE]**
+<img width="1818" height="1020" alt="Workflow runs · RealebogaMoche25_RaceDay_POE and 3 more pages - Profile 1 - Microsoft​ Edge 07 Oct 2026 21_17_53" src="https://github.com/user-attachments/assets/0b4d0d7a-8652-4946-a0a8-e50051349c18" />
+
+<img width="1822" height="1020" alt="Workflow runs · RealebogaMoche25_RaceDay_POE and 3 more pages - Profile 1 - Microsoft​ Edge 07 Oct 2026 21_15_48" src="https://github.com/user-attachments/assets/55f8d3e9-c653-454d-a785-174842a3073e" />
+
+
 
 The successful green build confirms that the RaceDay solution builds successfully and that the automated tests pass in GitHub Actions.
 
@@ -377,10 +386,4 @@ Part 2 includes:
 * Swagger API documentation
 * Automated unit tests
 * GitHub Actions continuous integration
-
-
-### Future Development
-The planned later stages of RaceDay will involve implementing the RESTful API and developing the MVC front-end.
-The API implementation will build on the endpoint plan created during Part 1.
-
-
+* Part 2 SQL database script
