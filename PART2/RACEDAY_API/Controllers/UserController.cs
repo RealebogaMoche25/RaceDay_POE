@@ -18,8 +18,14 @@ namespace RACEDAY_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves the profile of the authenticated user.
+        /// </summary>
         // GET: api/users/me
         [HttpGet("me")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetProfile()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -50,8 +56,14 @@ namespace RACEDAY_API.Controllers
             });
         }
 
+        /// <summary>
+        /// Updates the profile information of the authenticated user.
+        /// </summary>
         // PUT: api/users/me
         [HttpPut("me")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult UpdateProfile(User updatedUser)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

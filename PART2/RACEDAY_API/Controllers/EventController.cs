@@ -17,17 +17,26 @@ namespace RACEDAY_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves all events available on the RaceDay platform.
+        /// </summary>
         // GET: api/events
         // Anyone can view events
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetEvents()
         {
             return Ok(_context.Events.ToList());
         }
 
+        /// <summary>
+        /// Retrieves a specific event by its event ID.
+        /// </summary>
         // GET: api/events/{id}
         // Anyone can view a specific event
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetEvent(int id)
         {
             var eventItem = _context.Events.Find(id);
@@ -40,10 +49,15 @@ namespace RACEDAY_API.Controllers
             return Ok(eventItem);
         }
 
+        /// <summary>
+        /// Creates a new RaceDay event. Only authenticated Organisers can create events.
+        /// </summary>
         // POST: api/events
         // Only Organisers can create events
         [Authorize(Roles = "Organiser")]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult CreateEvent(Event newEvent)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -66,10 +80,17 @@ namespace RACEDAY_API.Controllers
                 newEvent);
         }
 
+        /// <summary>
+        /// Updates an existing event. Only the Organiser who owns the event can update it.
+        /// </summary>
         // PUT: api/events/{id}
         // Only the Organiser who owns the event can update it
         [Authorize(Roles = "Organiser")]
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult UpdateEvent(int id, Event updatedEvent)
         {
             var eventItem = _context.Events.Find(id);
@@ -106,10 +127,17 @@ namespace RACEDAY_API.Controllers
             return Ok(eventItem);
         }
 
+        /// <summary>
+        /// Deletes an existing event. Only the Organiser who owns the event can delete it.
+        /// </summary>
         // DELETE: api/events/{id}
-        // Only the Organiser who owns the event can delete it
+        // Only the Organiser who owns the event can delete the event
         [Authorize(Roles = "Organiser")]
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteEvent(int id)
         {
             var eventItem = _context.Events.Find(id);

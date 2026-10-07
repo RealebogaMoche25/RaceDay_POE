@@ -16,15 +16,24 @@ namespace RACEDAY_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves all routes available on the RaceDay platform.
+        /// </summary>
         // GET: api/routes
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetRoutes()
         {
             return Ok(_context.Routes.ToList());
         }
 
+        /// <summary>
+        /// Retrieves a specific route by its route ID.
+        /// </summary>
         // GET: api/routes/{id}
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetRoute(int id)
         {
             var route = _context.Routes.Find(id);
@@ -37,9 +46,16 @@ namespace RACEDAY_API.Controllers
             return Ok(route);
         }
 
+        /// <summary>
+        /// Creates a new route for an event. Only the Organiser who owns the event can create a route.
+        /// </summary>
         // POST: api/routes
         [Authorize(Roles = "Organiser")]
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult CreateRoute(
             RACEDAY_API.Models.Route newRoute)
         {
@@ -73,9 +89,16 @@ namespace RACEDAY_API.Controllers
                 newRoute);
         }
 
+        /// <summary>
+        /// Updates an existing route. Only the Organiser who owns the associated event can update it.
+        /// </summary>
         // PUT: api/routes/{id}
         [Authorize(Roles = "Organiser")]
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult UpdateRoute(
             int id,
             RACEDAY_API.Models.Route updatedRoute)
@@ -118,9 +141,16 @@ namespace RACEDAY_API.Controllers
             return Ok(route);
         }
 
+        /// <summary>
+        /// Deletes an existing route. Only the Organiser who owns the associated event can delete it.
+        /// </summary>
         // DELETE: api/routes/{id}
         [Authorize(Roles = "Organiser")]
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteRoute(int id)
         {
             var route = _context.Routes.Find(id);

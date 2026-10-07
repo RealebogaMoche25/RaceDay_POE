@@ -18,8 +18,14 @@ namespace RACEDAY_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Registers a new user account as either an Organiser or Participant.
+        /// </summary>
         // POST: api/auth/register
         [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public IActionResult Register(RegisterDto newUser)
         {
             if (string.IsNullOrWhiteSpace(newUser.FirstName) ||
@@ -70,8 +76,14 @@ namespace RACEDAY_API.Controllers
             });
         }
 
+        /// <summary>
+        /// Authenticates a registered user and creates a server-side session containing their user ID and role.
+        /// </summary>
         // POST: api/auth/login
         [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login(LoginDto loginUser)
         {
             if (string.IsNullOrWhiteSpace(loginUser.Email) ||
@@ -125,8 +137,12 @@ namespace RACEDAY_API.Controllers
             });
         }
 
+        /// <summary>
+        /// Logs out the currently authenticated user and ends their server-side session.
+        /// </summary>
         // POST: api/auth/logout
         [HttpPost("logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(
@@ -138,8 +154,12 @@ namespace RACEDAY_API.Controllers
             });
         }
 
+        /// <summary>
+        /// Returns a 403 Forbidden response when an authenticated user attempts to access a restricted resource.
+        /// </summary>
         // GET: api/auth/access-denied
         [HttpGet("access-denied")]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public IActionResult AccessDenied()
         {
             return StatusCode(403, "Access denied.");

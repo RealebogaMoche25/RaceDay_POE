@@ -16,9 +16,15 @@ namespace RACEDAY_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Enrols the authenticated Participant in an event.
+        /// </summary>
         // POST: api/enrolments
         [Authorize(Roles = "Participant")]
         [HttpPost("api/enrolments")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult CreateEnrolment(Enrolment newEnrolment)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -50,9 +56,14 @@ namespace RACEDAY_API.Controllers
                 newEnrolment);
         }
 
+        /// <summary>
+        /// Retrieves all event enrolments belonging to the authenticated Participant.
+        /// </summary>
         // GET: api/enrolments/mine
         [Authorize(Roles = "Participant")]
         [HttpGet("api/enrolments/mine")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult GetMyEnrolments()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -71,9 +82,16 @@ namespace RACEDAY_API.Controllers
             return Ok(enrolments);
         }
 
+        /// <summary>
+        /// Retrieves all enrolments for an event. Only the Organiser who owns the event can view them.
+        /// </summary>
         // GET: api/events/{eventId}/enrolments
         [Authorize(Roles = "Organiser")]
         [HttpGet("api/events/{eventId}/enrolments")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetEventEnrolments(int eventId)
         {
             var eventItem = _context.Events.Find(eventId);
@@ -104,9 +122,16 @@ namespace RACEDAY_API.Controllers
             return Ok(enrolments);
         }
 
+        /// <summary>
+        /// Retrieves a specific enrolment. Participants can view their own enrolments, while Organisers can view enrolments for their own events.
+        /// </summary>
         // GET: api/enrolments/{id}
         [Authorize]
         [HttpGet("api/enrolments/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetEnrolment(int id)
         {
             var enrolment = _context.Enrolments.Find(id);

@@ -16,9 +16,14 @@ namespace RACEDAY_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Retrieves all categories associated with a specific event.
+        /// </summary>
         // GET: api/events/{eventId}/categories
         // Anyone can view categories
         [HttpGet("api/events/{eventId}/categories")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetEventCategories(int eventId)
         {
             var eventItem = _context.Events.Find(eventId);
@@ -35,10 +40,17 @@ namespace RACEDAY_API.Controllers
             return Ok(categories);
         }
 
+        /// <summary>
+        /// Creates a new category for an event. Only the Organiser who owns the event can create a category.
+        /// </summary>
         // POST: api/events/{eventId}/categories
         // Only the Organiser who owns the event can create a category
         [Authorize(Roles = "Organiser")]
         [HttpPost("api/events/{eventId}/categories")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult CreateCategory(
             int eventId,
             Category newCategory)
@@ -75,9 +87,14 @@ namespace RACEDAY_API.Controllers
                 newCategory);
         }
 
+        /// <summary>
+        /// Retrieves a specific category by its category ID.
+        /// </summary>
         // GET: api/categories/{id}
         // Anyone can view a category
         [HttpGet("api/categories/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetCategory(int id)
         {
             var category = _context.Categories.Find(id);
@@ -90,10 +107,17 @@ namespace RACEDAY_API.Controllers
             return Ok(category);
         }
 
+        /// <summary>
+        /// Updates an existing category. Only the Organiser who owns the associated event can update it.
+        /// </summary>
         // PUT: api/categories/{id}
         // Only the Organiser who owns the event can update the category
         [Authorize(Roles = "Organiser")]
         [HttpPut("api/categories/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult UpdateCategory(
             int id,
             Category updatedCategory)
@@ -134,10 +158,17 @@ namespace RACEDAY_API.Controllers
             return Ok(category);
         }
 
+        /// <summary>
+        /// Deletes an existing category. Only the Organiser who owns the associated event can delete it.
+        /// </summary>
         // DELETE: api/categories/{id}
         // Only the Organiser who owns the event can delete the category
         [Authorize(Roles = "Organiser")]
         [HttpDelete("api/categories/{id}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DeleteCategory(int id)
         {
             var category = _context.Categories.Find(id);

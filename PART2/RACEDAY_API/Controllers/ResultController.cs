@@ -16,9 +16,16 @@ namespace RACEDAY_API.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Creates a result for a participant's event enrolment. Only the Organiser who owns the event can create results.
+        /// </summary>
         // POST: api/results
         [Authorize(Roles = "Organiser")]
         [HttpPost("api/results")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult CreateResult(Result newResult)
         {
             var enrolment = _context.Enrolments
@@ -60,9 +67,16 @@ namespace RACEDAY_API.Controllers
                 newResult);
         }
 
+        /// <summary>
+        /// Updates an existing result. Only the Organiser who owns the associated event can update it.
+        /// </summary>
         // PUT: api/results/{id}
         [Authorize(Roles = "Organiser")]
         [HttpPut("api/results/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult UpdateResult(
             int id,
             Result updatedResult)
@@ -112,9 +126,14 @@ namespace RACEDAY_API.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Retrieves all results belonging to the authenticated Participant.
+        /// </summary>
         // GET: api/results/mine
         [Authorize(Roles = "Participant")]
         [HttpGet("api/results/mine")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public IActionResult GetMyResults()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -135,9 +154,16 @@ namespace RACEDAY_API.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// Retrieves all results for an event. Only the Organiser who owns the event can view its results.
+        /// </summary>
         // GET: api/events/{eventId}/results
         [Authorize(Roles = "Organiser")]
         [HttpGet("api/events/{eventId}/results")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetEventResults(int eventId)
         {
             var eventItem = _context.Events.Find(eventId);
@@ -170,9 +196,16 @@ namespace RACEDAY_API.Controllers
             return Ok(results);
         }
 
+        /// <summary>
+        /// Retrieves a specific result. Participants can view their own results, while Organisers can view results for their own events.
+        /// </summary>
         // GET: api/results/{id}
         [Authorize]
         [HttpGet("api/results/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult GetResult(int id)
         {
             var result = _context.Results.Find(id);
