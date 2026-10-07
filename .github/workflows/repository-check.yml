@@ -22,3 +22,14 @@ jobs:
 
           echo "All required Part 1 files are present."
           echo "RaceDay repository structure check passed successfully."
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Build RaceDay solution
+        run: dotnet build RaceDay_POE.slnx --configuration Release
+
+      - name: Run RaceDay tests
+        run: dotnet test RaceDay_POE.slnx --configuration Release
