@@ -343,7 +343,7 @@ The Part 1 video demonstrates the project documentation, database design, API En
 
 ### Part 2 YouTube Video
 
-**[INSERT PART 2 UNLISTED YOUTUBE VIDEO LINK HERE]**
+https://youtu.be/saAEh8LWw7w?feature=shared
 
 The Part 2 video demonstrates the RaceDay ASP.NET Core Web API, authentication and authorization, organiser and participant functionality, API testing, automated unit tests, and the successful GitHub Actions build.
 
