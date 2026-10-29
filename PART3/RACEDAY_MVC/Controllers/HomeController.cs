@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
-using RACEDAY_MVC.Models;
+using RaceDay.Web.Models;
 using System.Diagnostics;
 
-namespace RACEDAY_MVC.Controllers
+namespace RaceDay.Web.Controllers
 {
     public class HomeController : Controller
     {
