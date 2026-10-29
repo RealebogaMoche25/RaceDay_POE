@@ -1,8 +1,8 @@
 ﻿
 using System.Net.Http.Json;
-using RACEDAY_MVC.ViewModels;
+using RaceDay.Web.ViewModels;
 
-namespace RACEDAY_MVC.Services
+namespace RaceDay.Web.Services
 {
     public class AuthApiService
     {
@@ -46,6 +46,36 @@ namespace RACEDAY_MVC.Services
                 Message = "Registration completed."
             };
         }
+
+
+        public async Task<AuthResponseViewModel> LoginAsync(
+            LoginViewModel model)
+        {
+            var client = _httpClientFactory.CreateClient("RaceDayApi");
+
+            var response = await client.PostAsJsonAsync(
+                "api/auth/login",
+                new
+                {
+                    email = model.Email,
+                    password = model.Password
+                });
+
+            var result = await response.Content
+                .ReadFromJsonAsync<AuthResponseViewModel>();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException(
+                    result?.Message ?? "Invalid email or password.",
+                    null,
+                    response.StatusCode);
+            }
+
+            return result ?? throw new HttpRequestException(
+                "The API returned an empty login response.");
+        }
+
     }
 }
 

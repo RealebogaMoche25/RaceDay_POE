@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace RACEDAY_MVC.ViewModels
+namespace RaceDay.Web.ViewModels
 {
     public class RegisterViewModel
     {

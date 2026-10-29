@@ -1,6 +1,6 @@
 ﻿
 
-namespace RACEDAY_MVC.ViewModels
+namespace RaceDay.Web.ViewModels
 {
     public class AuthResponseViewModel
     {
