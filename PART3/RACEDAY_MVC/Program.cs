@@ -21,6 +21,7 @@ builder.Services.AddHttpClient("RaceDayApi", client =>
 });
 
 builder.Services.AddScoped<RaceDay.Web.Services.AuthApiService>();
+
 builder.Services.AddScoped<RaceDay.Web.Services.ApiService>();
 
 var app = builder.Build();
