@@ -3,17 +3,28 @@
 
 @{
     ViewData["Title"] = "Browse Events";
+
+    var locations = Model
+        .Where(e => !string.IsNullOrWhiteSpace(e.EventLocation))
+        .Select(e => e.EventLocation!)
+        .Distinct()
+        .OrderBy(location => location)
+        .ToList();
+
+    var eventTypes = Model
+        .Where(e => !string.IsNullOrWhiteSpace(e.EventType))
+        .Select(e => e.EventType!)
+        .Distinct()
+        .OrderBy(type => type)
+        .ToList();
 }
 
 <div class="container py-5">
-    <div class="d-flex flex-column flex-md-row
-                justify-content-between align-items-md-center mb-4">
-        <div>
-            <h1 class="fw-bold">RaceDay Events</h1>
-            <p class="text-muted mb-0">
-                Discover upcoming races and community events.
-            </p>
-        </div>
+    <div class="mb-4">
+        <h1 class="fw-bold">RaceDay Events</h1>
+        <p class="text-muted">
+            Discover races and community events. Find an event that suits you.
+        </p>
     </div>
 
     @if (ViewBag.ErrorMessage != null)
@@ -30,10 +41,69 @@
     }
     else
     {
-        <div class="row g-4">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">Find an Event</h2>
+
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label for="eventSearch" class="form-label">
+                            Search by event name
+                        </label>
+                        <input type="search"
+                               id="eventSearch"
+                               class="form-control"
+                               placeholder="e.g. RaceDay Demo Run" />
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="locationFilter" class="form-label">
+                            Filter by location
+                        </label>
+                        <select id="locationFilter" class="form-select">
+                            <option value="">All locations</option>
+                            @foreach (var location in locations)
+                            {
+                                <option value="@location">@location</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="col-12 col-md-4">
+                        <label for="typeFilter" class="form-label">
+                            Filter by event type
+                        </label>
+                        <select id="typeFilter" class="form-select">
+                            <option value="">All event types</option>
+                            @foreach (var type in eventTypes)
+                            {
+                                <option value="@type">@type</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap align-items-center gap-3 mt-3">
+                    <button type="button"
+                            id="clearFilters"
+                            class="btn btn-outline-secondary">
+                        Clear Filters
+                    </button>
+
+                    <span id="eventCount"
+                          class="text-muted small"
+                          aria-live="polite"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4" id="eventCards">
             @foreach (var raceEvent in Model)
             {
-                <div class="col-12 col-md-6 col-lg-4">
+                <div class="col-12 col-md-6 col-lg-4 event-card"
+                     data-name="@raceEvent.EventName"
+                     data-location="@raceEvent.EventLocation"
+                     data-type="@raceEvent.EventType">
                     <div class="card h-100 shadow-sm border-0">
                         @if (!string.IsNullOrWhiteSpace(raceEvent.BannerImageUrl)
                              && Uri.IsWellFormedUriString(
@@ -66,9 +136,7 @@
                                 </span>
                             </div>
 
-                            <h2 class="h5 fw-bold">
-                                @raceEvent.EventName
-                            </h2>
+                            <h2 class="h5 fw-bold">@raceEvent.EventName</h2>
 
                             <p class="text-muted small">
                                 @raceEvent.EventDescription
@@ -102,6 +170,77 @@
                 </div>
             }
         </div>
+
+        <div id="noMatchingEvents"
+             class="alert alert-info mt-4"
+             role="status"
+             style="display: none;">
+            No events match your search. Try changing or clearing your filters.
+        </div>
     }
 </div>
 
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchInput = document.getElementById("eventSearch");
+            const locationFilter = document.getElementById("locationFilter");
+            const typeFilter = document.getElementById("typeFilter");
+            const clearButton = document.getElementById("clearFilters");
+            const eventCards = document.querySelectorAll(".event-card");
+            const eventCount = document.getElementById("eventCount");
+            const noMatchingEvents = document.getElementById("noMatchingEvents");
+
+            function filterEvents() {
+                const searchTerm = searchInput.value.trim().toLowerCase();
+                const selectedLocation = locationFilter.value.toLowerCase();
+                const selectedType = typeFilter.value.toLowerCase();
+
+                let visibleCount = 0;
+
+                eventCards.forEach(function (card) {
+                    const name = (card.dataset.name || "").toLowerCase();
+                    const location = (card.dataset.location || "").toLowerCase();
+                    const type = (card.dataset.type || "").toLowerCase();
+
+                    const matchesName = name.includes(searchTerm);
+                    const matchesLocation =
+                        selectedLocation === "" || location === selectedLocation;
+                    const matchesType =
+                        selectedType === "" || type === selectedType;
+
+                    const matches =
+                        matchesName && matchesLocation && matchesType;
+
+                    card.style.display = matches ? "" : "none";
+
+                    if (matches) {
+                        visibleCount++;
+                    }
+                });
+
+                eventCount.textContent =
+                    visibleCount + (visibleCount === 1
+                        ? " event found"
+                        : " events found");
+
+                noMatchingEvents.style.display =
+                    visibleCount === 0 ? "" : "none";
+            }
+
+            searchInput.addEventListener("input", filterEvents);
+            locationFilter.addEventListener("change", filterEvents);
+            typeFilter.addEventListener("change", filterEvents);
+
+            clearButton.addEventListener("click", function () {
+                searchInput.value = "";
+                locationFilter.value = "";
+                typeFilter.value = "";
+                filterEvents();
+                searchInput.focus();
+            });
+
+            filterEvents();
+        });
+    </script>
+}
