@@ -1,0 +1,147 @@
+﻿
+@model RaceDay.Web.ViewModels.ManageResultsViewModel
+
+@{
+    ViewData["Title"] = "Manage Results";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Manage Results</h2>
+            <p class="text-muted mb-0">
+                Record and manage race results for @Model.EventName.
+            </p>
+        </div>
+
+        <a asp-controller="Organiser"
+           asp-action="ManageEvents"
+           class="btn btn-outline-secondary">
+            Back to My Events
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (!Model.Enrolments.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <h5 class="fw-bold">No participants registered</h5>
+                <p class="text-muted mb-0">
+                    Participants must enrol in this event before results can be entered.
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+
+                <h5 class="fw-bold mb-3">Participant Results</h5>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Participant</th>
+                                <th>Category</th>
+                                <th>Finish Time</th>
+                                <th>Position</th>
+                                <th>Result Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var enrolment in Model.Enrolments)
+                            {
+                                var result = Model.Results.FirstOrDefault(
+                                    r => r.EnrolmentId == enrolment.EnrolmentId);
+
+                                <tr>
+                                    <td>
+                                        <div class="fw-semibold">
+                                            @enrolment.ParticipantName
+                                        </div>
+                                        <small class="text-muted">
+                                            Participant ID: @enrolment.ParticipantId
+                                        </small>
+                                    </td>
+
+                                    <td>@enrolment.CategoryName</td>
+
+                                    <td>
+                                        @(result != null
+                                            ? result.FinishTime.ToString(@"hh\:mm\:ss")
+                                            : "Not recorded")
+                                    </td>
+
+                                    <td>
+                                        @(result != null
+                                            ? result.FinishingPosition.ToString()
+                                            : "—")
+                                    </td>
+
+                                    <td>
+                                        @if (result != null)
+                                        {
+                                            <span class="badge bg-success">
+                                                Recorded
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning text-dark">
+                                                Pending
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        @if (result == null)
+                                        {
+                                            <a asp-controller="Organiser"
+                                               asp-action="EnterResult"
+                                               asp-route-eventId="@Model.EventId"
+                                               asp-route-enrolmentId="@enrolment.EnrolmentId"
+                                               class="btn btn-primary btn-sm">
+                                                Enter Result
+                                            </a>
+                                        }
+                                        else
+                                        {
+                                            <a asp-controller="Organiser"
+                                               asp-action="EditResult"
+                                               asp-route-eventId="@Model.EventId"
+                                               asp-route-resultId="@result.ResultId"
+                                               class="btn btn-outline-primary btn-sm">
+                                                Edit Result
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    }
+
+</div>

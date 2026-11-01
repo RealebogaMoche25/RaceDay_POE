@@ -327,5 +327,57 @@ namespace RaceDay.Web.Services
         }
 
 
+        public async Task<List<ResultViewModel>> GetEventResultsAsync(int eventId)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.GetAsync($"api/events/{eventId}/results");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to retrieve event results. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<ResultViewModel>>()
+                   ?? new List<ResultViewModel>();
+        }
+
+        public async Task<ResultViewModel?> CreateResultAsync(CreateResultViewModel model)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.PostAsJsonAsync("api/results", model);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to create result. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<ResultViewModel>();
+        }
+
+        public async Task<ResultViewModel?> UpdateResultAsync(int resultId, CreateResultViewModel model)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.PutAsJsonAsync($"api/results/{resultId}", model);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to update result. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<ResultViewModel>();
+        }
+
     }
 }

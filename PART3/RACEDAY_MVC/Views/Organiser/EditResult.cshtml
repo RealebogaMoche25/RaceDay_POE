@@ -1,0 +1,94 @@
+﻿@model RaceDay.Web.ViewModels.CreateResultViewModel
+
+@{
+    ViewData["Title"] = "Edit Result";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-6">
+
+            <div class="mb-4">
+                <h2 class="fw-bold">Edit Race Result</h2>
+                <p class="text-muted">
+                    Update the participant's finishing time or position.
+                </p>
+                <p class="fw-semibold">@ViewBag.EventName</p>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+
+                    <form asp-controller="Organiser"
+                          asp-action="EditResult"
+                          asp-route-eventId="@ViewBag.EventId"
+                          asp-route-resultId="@ViewBag.ResultId"
+                          method="post">
+
+                        @Html.AntiForgeryToken()
+
+                        <div asp-validation-summary="All"
+                             class="text-danger mb-3"></div>
+
+                        <input type="hidden" asp-for="EnrolmentId" />
+
+                        <div class="mb-3">
+                            <label asp-for="FinishTime"
+                                   class="form-label fw-semibold">
+                                Finish Time
+                            </label>
+
+                            <input asp-for="FinishTime"
+                                   type="text"
+                                   class="form-control"
+                                   placeholder="hh:mm:ss" />
+
+                            <span asp-validation-for="FinishTime"
+                                  class="text-danger"></span>
+
+                            <small class="text-muted">
+                                Example: 01:25:30
+                            </small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="FinishingPosition"
+                                   class="form-label fw-semibold">
+                                Finishing Position
+                            </label>
+
+                            <input asp-for="FinishingPosition"
+                                   type="number"
+                                   min="1"
+                                   class="form-control" />
+
+                            <span asp-validation-for="FinishingPosition"
+                                  class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                Save Changes
+                            </button>
+
+                            <a asp-controller="Organiser"
+                               asp-action="ManageResults"
+                               asp-route-eventId="@ViewBag.EventId"
+                               class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

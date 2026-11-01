@@ -411,5 +411,261 @@ namespace RaceDay.Web.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> ManageResults(int eventId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                var enrolments = await _apiService.GetEventEnrolmentsAsync(eventId);
+
+                var results = await _apiService.GetEventResultsAsync(eventId);
+
+                var model = new ManageResultsViewModel
+                {
+                    EventId = eventId,
+                    EventName = raceEvent.EventName,
+                    Enrolments = new List<OrganiserEnrolmentViewModel>(),
+                    Results = results
+                };
+
+                foreach (var enrolment in enrolments)
+                {
+                    var participant = await _apiService.GetParticipantAsync(
+                        enrolment.ParticipantId);
+
+                    var categories = await _apiService.GetEventCategoriesAsync(eventId);
+
+                    var category = categories.FirstOrDefault(
+                        c => c.CategoryId == enrolment.CategoryId);
+
+                    model.Enrolments.Add(new OrganiserEnrolmentViewModel
+                    {
+                        EnrolmentId = enrolment.EnrolmentId,
+                        ParticipantId = enrolment.ParticipantId,
+                        ParticipantName = participant == null
+                            ? "Participant unavailable"
+                            : $"{participant.FirstName} {participant.LastName}",
+                        EventId = enrolment.EventId,
+                        CategoryId = enrolment.CategoryId,
+                        CategoryName = category?.CategoryName ?? "Category unavailable",
+                        EnrolmentDate = enrolment.EnrolmentDate,
+                        EnrolmentStatus = enrolment.EnrolmentStatus
+                    });
+                }
+
+                return View(model);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load event results. Please try again.";
+
+                return RedirectToAction("ManageEvents");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EnterResult(int eventId, int enrolmentId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                var enrolments = await _apiService.GetEventEnrolmentsAsync(eventId);
+
+                var enrolment = enrolments.FirstOrDefault(
+                    e => e.EnrolmentId == enrolmentId);
+
+                if (enrolment == null)
+                {
+                    return NotFound();
+                }
+
+                var existingResults = await _apiService.GetEventResultsAsync(eventId);
+
+                if (existingResults.Any(r => r.EnrolmentId == enrolmentId))
+                {
+                    TempData["ErrorMessage"] = "This participant already has a result. Please edit the existing result instead.";
+
+                    return RedirectToAction("ManageResults", new { eventId });
+                }
+
+                var model = new CreateResultViewModel
+                {
+                    EnrolmentId = enrolmentId
+                };
+
+                ViewBag.EventId = eventId;
+                ViewBag.EventName = raceEvent.EventName;
+
+                return View(model);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load the result form.";
+                return RedirectToAction("ManageResults", new { eventId });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EnterResult(
+    int eventId,
+    CreateResultViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                ViewBag.EventId = eventId;
+                ViewBag.EventName = raceEvent?.EventName;
+
+                return View(model);
+            }
+
+            try
+            {
+                var enrolments = await _apiService.GetEventEnrolmentsAsync(eventId);
+
+                if (!enrolments.Any(e => e.EnrolmentId == model.EnrolmentId))
+                {
+                    return NotFound();
+                }
+
+                await _apiService.CreateResultAsync(model);
+
+                TempData["SuccessMessage"] = "Participant result recorded successfully.";
+
+                return RedirectToAction("ManageResults", new { eventId });
+            }
+            catch (HttpRequestException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                ViewBag.EventId = eventId;
+                ViewBag.EventName = raceEvent?.EventName;
+
+                return View(model);
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> EditResult(int eventId, int resultId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                var results = await _apiService.GetEventResultsAsync(eventId);
+
+                var result = results.FirstOrDefault(r => r.ResultId == resultId);
+
+                if (result == null)
+                {
+                    return NotFound();
+                }
+
+                var model = new CreateResultViewModel
+                {
+                    EnrolmentId = result.EnrolmentId,
+                    FinishTime = result.FinishTime,
+                    FinishingPosition = result.FinishingPosition
+                };
+
+                ViewBag.EventId = eventId;
+                ViewBag.EventName = raceEvent.EventName;
+                ViewBag.ResultId = resultId;
+
+                return View(model);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load the result for editing.";
+
+                return RedirectToAction("ManageResults", new { eventId });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditResult(
+    int eventId,
+    int resultId,
+    CreateResultViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.EventId = eventId;
+                ViewBag.ResultId = resultId;
+
+                return View(model);
+            }
+
+            try
+            {
+                var results = await _apiService.GetEventResultsAsync(eventId);
+
+                if (!results.Any(r => r.ResultId == resultId))
+                {
+                    return NotFound();
+                }
+
+                await _apiService.UpdateResultAsync(resultId, model);
+
+                TempData["SuccessMessage"] = "Participant result updated successfully.";
+
+                return RedirectToAction("ManageResults", new { eventId });
+            }
+            catch (HttpRequestException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+
+                ViewBag.EventId = eventId;
+                ViewBag.ResultId = resultId;
+
+                return View(model);
+            }
+        }
+
     }
 }
