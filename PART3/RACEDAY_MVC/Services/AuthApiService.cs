@@ -47,9 +47,8 @@ namespace RaceDay.Web.Services
             };
         }
 
-
-        public async Task<AuthResponseViewModel> LoginAsync(
-            LoginViewModel model)
+        public async Task<(AuthResponseViewModel Result, string? Cookie)>
+            LoginAsync(LoginViewModel model)
         {
             var client = _httpClientFactory.CreateClient("RaceDayApi");
 
@@ -72,10 +71,22 @@ namespace RaceDay.Web.Services
                     response.StatusCode);
             }
 
-            return result ?? throw new HttpRequestException(
-                "The API returned an empty login response.");
-        }
+            if (result == null)
+            {
+                throw new HttpRequestException(
+                    "The API returned an empty login response.");
+            }
 
+            string? cookie = null;
+
+            if (response.Headers.TryGetValues("Set-Cookie", out var cookies))
+            {
+                cookie = cookies
+                    .FirstOrDefault(value =>
+                        value.StartsWith("RaceDayAuth=", StringComparison.Ordinal));
+            }
+
+            return (result, cookie);
+        }
     }
 }
-

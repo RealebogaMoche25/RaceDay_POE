@@ -24,6 +24,8 @@ builder.Services.AddScoped<RaceDay.Web.Services.AuthApiService>();
 
 builder.Services.AddScoped<RaceDay.Web.Services.ApiService>();
 
+builder.Services.AddHttpContextAccessor();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -40,9 +40,7 @@ namespace RaceDay.Web.Controllers
             }
             catch (HttpRequestException ex)
             {
-                ModelState.AddModelError(
-                    string.Empty,
-                    ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
@@ -60,7 +58,6 @@ namespace RaceDay.Web.Controllers
             return View(new LoginViewModel());
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -72,8 +69,9 @@ namespace RaceDay.Web.Controllers
 
             try
             {
-                var result = await _authApiService.LoginAsync(model);
-
+                var loginResponse = await _authApiService.LoginAsync(model);
+                var result = loginResponse.Result;
+                var apiCookie = loginResponse.Cookie;
 
                 if (result.UserId <= 0 ||
                     string.IsNullOrWhiteSpace(result.Role))
@@ -85,35 +83,33 @@ namespace RaceDay.Web.Controllers
                     return View(model);
                 }
 
+                if (string.IsNullOrWhiteSpace(apiCookie))
+                {
+                    ModelState.AddModelError(
+                        string.Empty,
+                        "The API did not provide an authentication cookie. Please check the API cookie configuration.");
+
+                    return View(model);
+                }
+
                 HttpContext.Session.SetInt32("UserId", result.UserId);
-
                 HttpContext.Session.SetString(
-                    "FirstName",
-                    result.FirstName ?? string.Empty);
-
+                    "FirstName", result.FirstName ?? string.Empty);
                 HttpContext.Session.SetString(
-                    "LastName",
-                    result.LastName ?? string.Empty);
-
+                    "LastName", result.LastName ?? string.Empty);
                 HttpContext.Session.SetString(
-                    "Email",
-                    result.Email ?? string.Empty);
-
-                HttpContext.Session.SetString(
-                    "Role",
-                    result.Role);
+                    "Email", result.Email ?? string.Empty);
+                HttpContext.Session.SetString("Role", result.Role);
+                HttpContext.Session.SetString("ApiAuthCookie", apiCookie);
 
                 TempData["SuccessMessage"] =
                     $"Welcome back, {result.FirstName}!";
 
                 return RedirectToAction("Index", "Home");
-
             }
             catch (HttpRequestException ex)
             {
-                ModelState.AddModelError(
-                    string.Empty,
-                    ex.Message);
+                ModelState.AddModelError(string.Empty, ex.Message);
             }
             catch (Exception)
             {
@@ -125,18 +121,16 @@ namespace RaceDay.Web.Controllers
             return View(model);
         }
 
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
             HttpContext.Session.Clear();
 
-            TempData["SuccessMessage"] = "You have been logged out successfully.";
+            TempData["SuccessMessage"] =
+                "You have been logged out successfully.";
 
             return RedirectToAction("Index", "Home");
         }
-
-
     }
 }
