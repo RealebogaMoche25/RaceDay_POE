@@ -352,5 +352,64 @@ namespace RaceDay.Web.Controllers
                 return View(new List<EventViewModel>());
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ManageEnrolments(int eventId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                var enrolments = await _apiService.GetEventEnrolmentsAsync(eventId);
+                var categories = await _apiService.GetEventCategoriesAsync(eventId);
+
+                var organiserEnrolments = new List<OrganiserEnrolmentViewModel>();
+
+                foreach (var enrolment in enrolments)
+                {
+                    var participant = await _apiService.GetParticipantAsync(enrolment.ParticipantId);
+
+                    var category = categories.FirstOrDefault(
+                        c => c.CategoryId == enrolment.CategoryId);
+
+                    organiserEnrolments.Add(new OrganiserEnrolmentViewModel
+                    {
+                        EnrolmentId = enrolment.EnrolmentId,
+                        ParticipantId = enrolment.ParticipantId,
+                        ParticipantName = participant == null
+                            ? "Participant unavailable"
+                            : $"{participant.FirstName} {participant.LastName}",
+                        EventId = enrolment.EventId,
+                        CategoryId = enrolment.CategoryId,
+                        CategoryName = category?.CategoryName ?? "Category unavailable",
+                        EnrolmentDate = enrolment.EnrolmentDate,
+                        EnrolmentStatus = enrolment.EnrolmentStatus
+                    });
+                }
+
+                ViewBag.EventName = raceEvent.EventName;
+                ViewBag.EventId = eventId;
+
+                return View(organiserEnrolments);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load event enrolments. Please try again.";
+                return RedirectToAction("ManageEvents");
+            }
+        }
+
     }
 }

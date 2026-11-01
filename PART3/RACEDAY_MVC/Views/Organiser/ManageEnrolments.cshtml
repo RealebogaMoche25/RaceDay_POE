@@ -1,0 +1,95 @@
+﻿@model List<RaceDay.Web.ViewModels.OrganiserEnrolmentViewModel>
+
+@{
+    ViewData["Title"] = "Manage Enrolments";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="fw-bold">Manage Enrolments</h2>
+            <p class="text-muted mb-0">
+                View participants registered for @ViewBag.EventName.
+            </p>
+        </div>
+
+        <a asp-controller="Organiser"
+           asp-action="ManageEvents"
+           class="btn btn-outline-secondary">
+            Back to My Events
+        </a>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <h5 class="fw-bold">No enrolments yet</h5>
+                <p class="text-muted mb-0">
+                    Participants who register for this event will appear here.
+                </p>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Enrolment ID</th>
+                                <th>Participant</th>
+                                <th>Category</th>
+                                <th>Enrolment Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var enrolment in Model)
+                            {
+                                <tr>
+                                    <td>@enrolment.EnrolmentId</td>
+                                    <td>
+                                        <div class="fw-semibold">
+                                            @enrolment.ParticipantName
+                                        </div>
+                                        <small class="text-muted">
+                                            Participant ID: @enrolment.ParticipantId
+                                        </small>
+                                    </td>
+                                    <td>@enrolment.CategoryName</td>
+                                    <td>
+                                        @enrolment.EnrolmentDate.ToString("dd MMM yyyy")
+                                    </td>
+                                    <td>
+                                        @if (enrolment.EnrolmentStatus == "Active")
+                                        {
+                                            <span class="badge bg-success">Active</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-secondary">
+                                                @enrolment.EnrolmentStatus
+                                            </span>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

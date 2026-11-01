@@ -286,6 +286,46 @@ namespace RaceDay.Web.Services
             return enrolments ?? new List<EnrolmentViewModel>();
         }
 
+        public async Task<ParticipantViewModel?> GetParticipantAsync(int participantId)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.GetAsync($"api/users/participants/{participantId}");
+
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                return null;
+            }
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to retrieve participant details. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<ParticipantViewModel>();
+        }
+
+        public async Task<List<EnrolmentViewModel>> GetEventEnrolmentsAsync(int eventId)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.GetAsync($"api/events/{eventId}/enrolments");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to retrieve event enrolments. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<EnrolmentViewModel>>()
+                   ?? new List<EnrolmentViewModel>();
+        }
+
 
     }
 }

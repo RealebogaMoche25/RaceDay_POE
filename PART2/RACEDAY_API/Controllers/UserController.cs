@@ -101,5 +101,33 @@ namespace RACEDAY_API.Controllers
                 user.ProfilePictureUrl
             });
         }
+
+        /// <summary>
+        /// Retrieves basic participant details by user ID.
+        /// Only organisers can access this endpoint.
+        /// </summary>
+        // GET: api/users/participants/{id}
+        [HttpGet("participants/{id}")]
+        [Authorize(Roles = "Organiser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult GetParticipant(int id)
+        {
+            var user = _context.Users.FirstOrDefault(u =>
+                u.UserId == id && u.Role == "Participant");
+
+            if (user == null)
+            {
+                return NotFound("Participant not found.");
+            }
+
+            return Ok(new
+            {
+                user.UserId,
+                user.FirstName,
+                user.LastName
+            });
+        }
+
     }
 }

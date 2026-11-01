@@ -53,17 +53,24 @@
 </div>
 
 
-        <div class="col-md-6 col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold">Manage Enrolments</h5>
-                    <p class="text-muted">
-                        Review participants registered for your events.
-                    </p>
-                    <span class="badge bg-secondary">Coming soon</span>
-                </div>
-            </div>
+       <div class="col-md-6 col-lg-4">
+    <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+            <h5 class="fw-bold">Manage Enrolments</h5>
+
+            <p class="text-muted">
+                View participants registered for your sporting events,
+                including their categories and enrolment details.
+            </p>
+
+            <a asp-controller="Organiser"
+               asp-action="ManageEvents"
+               class="btn btn-primary">
+                Select Event
+            </a>
         </div>
+    </div>
+</div>
 
         <div class="col-md-6 col-lg-4">
             <div class="card border-0 shadow-sm h-100">
