@@ -131,6 +131,69 @@ namespace RaceDay.Web.Services
         }
 
 
+
+        // Create a category for an event
+        public async Task<CategoryViewModel?> CreateCategoryAsync(
+            int eventId, CategoryViewModel model)
+        {
+            var client = CreateApiClient();
+
+            model.EventId = eventId;
+
+            var response = await client.PostAsJsonAsync(
+                $"api/events/{eventId}/categories", model);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to create category. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<CategoryViewModel>();
+        }
+
+
+        // Update an existing category
+        public async Task<CategoryViewModel?> UpdateCategoryAsync(
+            int categoryId, CategoryViewModel model)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.PutAsJsonAsync(
+                $"api/categories/{categoryId}", model);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to update category. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<CategoryViewModel>();
+        }
+
+
+        // Delete a category
+        public async Task DeleteCategoryAsync(int categoryId)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.DeleteAsync(
+                $"api/categories/{categoryId}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to delete category. Status: {response.StatusCode}. {error}");
+            }
+        }
+
+
         public async Task<EnrolmentViewModel> CreateEnrolmentAsync(
             int eventId,
             int categoryId)

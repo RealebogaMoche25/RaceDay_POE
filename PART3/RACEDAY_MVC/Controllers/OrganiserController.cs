@@ -141,6 +141,195 @@ namespace RaceDay.Web.Controllers
 
 
         [HttpGet]
+        public async Task<IActionResult> ManageCategories(int eventId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                var categories = await _apiService.GetEventCategoriesAsync(eventId);
+
+                var model = new ManageCategoriesViewModel
+                {
+                    EventId = raceEvent.EventId,
+                    EventName = raceEvent.EventName,
+                    Categories = categories
+                };
+
+                return View(model);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load event categories.";
+                return RedirectToAction("ManageEvents");
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> CreateCategory(int eventId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                ViewBag.EventId = raceEvent.EventId;
+                ViewBag.EventName = raceEvent.EventName;
+
+                return View();
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load the event.";
+                return RedirectToAction("ManageEvents");
+            }
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateCategory(int eventId, CategoryViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.EventId = eventId;
+                return View(model);
+            }
+
+            try
+            {
+                await _apiService.CreateCategoryAsync(eventId, model);
+
+                TempData["SuccessMessage"] = "Category created successfully.";
+
+                return RedirectToAction("ManageCategories", new { eventId });
+            }
+            catch (HttpRequestException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                ViewBag.EventId = eventId;
+
+                return View(model);
+            }
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> EditCategory(int eventId, int categoryId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                var categories = await _apiService.GetEventCategoriesAsync(eventId);
+
+                var category = categories.FirstOrDefault(
+                    c => c.CategoryId == categoryId);
+
+                if (category == null)
+                {
+                    return NotFound();
+                }
+
+                ViewBag.EventName = raceEvent.EventName;
+
+                return View(category);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load the category.";
+                return RedirectToAction("ManageCategories", new { eventId });
+            }
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteCategory(int eventId, int categoryId)
+        {
+            try
+            {
+                await _apiService.DeleteCategoryAsync(categoryId);
+
+                TempData["SuccessMessage"] = "Category deleted successfully.";
+
+                return RedirectToAction("ManageCategories", new { eventId });
+            }
+            catch (HttpRequestException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+
+                return RedirectToAction("ManageCategories", new { eventId });
+            }
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditCategory(
+            int eventId, int categoryId, CategoryViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                model.EventId = eventId;
+                model.CategoryId = categoryId;
+
+                await _apiService.UpdateCategoryAsync(categoryId, model);
+
+                TempData["SuccessMessage"] = "Category updated successfully.";
+
+                return RedirectToAction("ManageCategories", new { eventId });
+            }
+            catch (HttpRequestException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(model);
+            }
+        }
+
+
+        [HttpGet]
         public async Task<IActionResult> ManageEvents()
         {
             try

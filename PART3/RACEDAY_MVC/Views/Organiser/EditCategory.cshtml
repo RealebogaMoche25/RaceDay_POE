@@ -1,0 +1,90 @@
+﻿
+@model RaceDay.Web.ViewModels.CategoryViewModel
+
+@{
+    ViewData["Title"] = "Edit Category";
+}
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h2>Edit Category</h2>
+        <p class="text-muted">
+            Update the details of this event category.
+        </p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-controller="Organiser"
+                  asp-action="EditCategory"
+                  asp-route-eventId="@Model.EventId"
+                  asp-route-categoryId="@Model.CategoryId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden" asp-for="EventId" />
+                <input type="hidden" asp-for="CategoryId" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryName"
+                           class="form-label">
+                        Category Name
+                    </label>
+
+                    <input asp-for="CategoryName"
+                           class="form-control" />
+
+                    <span asp-validation-for="CategoryName"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryDescription"
+                           class="form-label">
+                        Category Description
+                    </label>
+
+                    <textarea asp-for="CategoryDescription"
+                              class="form-control"
+                              rows="4">
+                    </textarea>
+
+                    <span asp-validation-for="CategoryDescription"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Save Changes
+                    </button>
+
+                    <a asp-controller="Organiser"
+                       asp-action="ManageCategories"
+                       asp-route-eventId="@Model.EventId"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

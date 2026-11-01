@@ -1,0 +1,92 @@
+﻿
+@model RaceDay.Web.ViewModels.CategoryViewModel
+
+@{
+    ViewData["Title"] = "Create Category";
+}
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h2>Create Event Category</h2>
+        <p class="text-muted">
+            Add a category for your event.
+        </p>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-controller="Organiser"
+                  asp-action="CreateCategory"
+                  asp-route-eventId="@ViewBag.EventId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input type="hidden"
+                       name="eventId"
+                       value="@ViewBag.EventId" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryName"
+                           class="form-label">
+                        Category Name
+                    </label>
+
+                    <input asp-for="CategoryName"
+                           class="form-control"
+                           placeholder="e.g. 5 KM, 10 KM or 21 KM" />
+
+                    <span asp-validation-for="CategoryName"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="CategoryDescription"
+                           class="form-label">
+                        Category Description
+                    </label>
+
+                    <textarea asp-for="CategoryDescription"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Describe this event category">
+                    </textarea>
+
+                    <span asp-validation-for="CategoryDescription"
+                          class="text-danger">
+                    </span>
+                </div>
+
+                <div class="d-flex gap-2">
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Create Category
+                    </button>
+
+                    <a asp-controller="Organiser"
+                       asp-action="ManageCategories"
+                       asp-route-eventId="@ViewBag.EventId"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
