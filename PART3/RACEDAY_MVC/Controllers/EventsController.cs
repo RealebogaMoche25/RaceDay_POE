@@ -33,6 +33,7 @@ namespace RaceDay.Web.Controllers
         }
 
 
+
         public async Task<IActionResult> Details(int id)
         {
             try
@@ -44,13 +45,25 @@ namespace RaceDay.Web.Controllers
                     return NotFound();
                 }
 
-                return View(raceEvent);
+                var categories = await _apiService.GetEventCategoriesAsync(id);
+
+                var viewModel = new RaceDay.Web.ViewModels.EventDetailsViewModel
+                {
+                    Event = raceEvent,
+                    Categories = categories
+                };
+
+                return View(viewModel);
             }
             catch (HttpRequestException)
             {
+                ViewBag.ErrorMessage =
+                    "We couldn't load the event details. Please try again later.";
+
                 return View("Error");
             }
         }
+
 
 
     }
