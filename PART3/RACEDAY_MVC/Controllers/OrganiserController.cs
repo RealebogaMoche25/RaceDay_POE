@@ -667,5 +667,227 @@ namespace RaceDay.Web.Controllers
             }
         }
 
+
+        [HttpGet]
+        public async Task<IActionResult> ManageRoutes(int eventId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                var routes = await _apiService.GetEventRoutesAsync(eventId);
+
+                ViewBag.EventId = eventId;
+                ViewBag.EventName = raceEvent.EventName;
+
+                return View(routes);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load event routes. Please try again.";
+                return RedirectToAction("ManageEvents");
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CreateRoute(int eventId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                ViewBag.EventId = eventId;
+                ViewBag.EventName = raceEvent.EventName;
+
+                return View(new CreateRouteViewModel());
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load the event.";
+                return RedirectToAction("ManageEvents");
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateRoute(
+            int eventId, CreateRouteViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.EventId = eventId;
+                return View(model);
+            }
+
+            try
+            {
+                await _apiService.CreateRouteAsync(eventId, model);
+
+                TempData["SuccessMessage"] = "Route created successfully.";
+
+                return RedirectToAction("ManageRoutes", new { eventId });
+            }
+            catch (HttpRequestException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                ViewBag.EventId = eventId;
+
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditRoute(int eventId, int routeId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                var routes = await _apiService.GetEventRoutesAsync(eventId);
+
+                var route = routes.FirstOrDefault(r => r.RouteId == routeId);
+
+                if (route == null)
+                {
+                    return NotFound();
+                }
+
+                var model = new CreateRouteViewModel
+                {
+                    RouteName = route.RouteName,
+                    RouteDescription = route.RouteDescription,
+                    RouteUrl = route.RouteUrl,
+                    RouteLocation = route.RouteLocation
+                };
+
+                ViewBag.EventId = eventId;
+                ViewBag.EventName = raceEvent.EventName;
+                ViewBag.RouteId = routeId;
+
+                return View(model);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load the route for editing.";
+
+                return RedirectToAction("ManageRoutes", new { eventId });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditRoute(
+            int eventId, int routeId, CreateRouteViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.EventId = eventId;
+                ViewBag.RouteId = routeId;
+                return View(model);
+            }
+
+            try
+            {
+                var routes = await _apiService.GetEventRoutesAsync(eventId);
+
+                if (!routes.Any(r => r.RouteId == routeId))
+                {
+                    return NotFound();
+                }
+
+                await _apiService.UpdateRouteAsync(routeId, model);
+
+                TempData["SuccessMessage"] = "Route updated successfully.";
+
+                return RedirectToAction("ManageRoutes", new { eventId });
+            }
+            catch (HttpRequestException ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                ViewBag.EventId = eventId;
+                ViewBag.RouteId = routeId;
+
+                return View(model);
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteRoute(int eventId, int routeId)
+        {
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(eventId);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                var routes = await _apiService.GetEventRoutesAsync(eventId);
+
+                if (!routes.Any(r => r.RouteId == routeId))
+                {
+                    return NotFound();
+                }
+
+                await _apiService.DeleteRouteAsync(routeId);
+
+                TempData["SuccessMessage"] = "Route deleted successfully.";
+
+                return RedirectToAction("ManageRoutes", new { eventId });
+            }
+            catch (HttpRequestException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+
+                return RedirectToAction("ManageRoutes", new { eventId });
+            }
+        }
+
+
     }
 }

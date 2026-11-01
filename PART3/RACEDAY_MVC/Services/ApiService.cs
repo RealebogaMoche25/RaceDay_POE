@@ -379,5 +379,90 @@ namespace RaceDay.Web.Services
             return await response.Content.ReadFromJsonAsync<ResultViewModel>();
         }
 
+        public async Task<List<RouteViewModel>> GetEventRoutesAsync(int eventId)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.GetAsync("api/routes");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException(
+                    $"Unable to retrieve routes. Status: {response.StatusCode}. {error}");
+            }
+
+            var routes = await response.Content.ReadFromJsonAsync<List<RouteViewModel>>()
+                         ?? new List<RouteViewModel>();
+
+            return routes.Where(r => r.EventId == eventId).ToList();
+        }
+
+        public async Task<RouteViewModel?> CreateRouteAsync(
+            int eventId, CreateRouteViewModel model)
+        {
+            var client = CreateApiClient();
+
+            var routeData = new
+            {
+                model.RouteName,
+                model.RouteDescription,
+                model.RouteUrl,
+                model.RouteLocation,
+                EventId = eventId
+            };
+
+            var response = await client.PostAsJsonAsync("api/routes", routeData);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException(
+                    $"Unable to create route. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<RouteViewModel>();
+        }
+
+        public async Task<RouteViewModel?> UpdateRouteAsync(
+            int routeId, CreateRouteViewModel model)
+        {
+            var client = CreateApiClient();
+
+            var routeData = new
+            {
+                model.RouteName,
+                model.RouteDescription,
+                model.RouteUrl,
+                model.RouteLocation
+            };
+
+            var response = await client.PutAsJsonAsync(
+                $"api/routes/{routeId}", routeData);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException(
+                    $"Unable to update route. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<RouteViewModel>();
+        }
+
+        public async Task DeleteRouteAsync(int routeId)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.DeleteAsync($"api/routes/{routeId}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+                throw new HttpRequestException(
+                    $"Unable to delete route. Status: {response.StatusCode}. {error}");
+            }
+        }
+
     }
 }

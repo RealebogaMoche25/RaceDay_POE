@@ -1,0 +1,128 @@
+﻿@model List<RaceDay.Web.ViewModels.RouteViewModel>
+
+@{
+    ViewData["Title"] = "Manage Routes";
+}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2>Manage Routes</h2>
+            <p class="text-muted">@ViewBag.EventName</p>
+        </div>
+
+        <a asp-controller="Organiser"
+           asp-action="CreateRoute"
+           asp-route-eventId="@ViewBag.EventId"
+           class="btn btn-primary">
+            Create New Route
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Route Name</th>
+                        <th>Description</th>
+                        <th>Location</th>
+                        <th>Route Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var route in Model)
+                    {
+                        <tr>
+                            <td>@route.RouteName</td>
+                            <td>@route.RouteDescription</td>
+                            <td>@route.RouteLocation</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(route.RouteUrl))
+                                {
+                                    <a href="@route.RouteUrl"
+                                       target="_blank"
+                                       rel="noopener noreferrer">
+                                        View Route
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No link available</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+
+                                    <a asp-controller="Organiser"
+                                       asp-action="EditRoute"
+                                       asp-route-eventId="@ViewBag.EventId"
+                                       asp-route-routeId="@route.RouteId"
+                                       class="btn btn-sm btn-outline-primary">
+                                        Edit
+                                    </a>
+
+                                    <form asp-controller="Organiser"
+                                          asp-action="DeleteRoute"
+                                          method="post"
+                                          onsubmit="return confirm('Are you sure you want to delete this route?');">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="eventId"
+                                               value="@ViewBag.EventId" />
+
+                                        <input type="hidden"
+                                               name="routeId"
+                                               value="@route.RouteId" />
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-outline-danger">
+                                            Delete
+                                        </button>
+
+                                    </form>
+
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            No routes have been added to this event yet.
+        </div>
+    }
+
+    <a asp-controller="Organiser"
+       asp-action="ManageEvents"
+       class="btn btn-outline-secondary mt-3">
+        Back to Manage Events
+    </a>
+
+</div>

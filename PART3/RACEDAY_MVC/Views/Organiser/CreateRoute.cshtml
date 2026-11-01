@@ -1,0 +1,108 @@
+﻿@model RaceDay.Web.ViewModels.CreateRouteViewModel
+
+@{
+    ViewData["Title"] = "Create Route";
+}
+
+<div class="container mt-4">
+
+    <h2>Create Event Route</h2>
+    <p class="text-muted">Event: @ViewBag.EventName</p>
+
+    <div class="card shadow-sm mt-4">
+        <div class="card-body">
+
+            <form asp-controller="Organiser"
+                  asp-action="CreateRoute"
+                  asp-route-eventId="@ViewBag.EventId"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3"></div>
+
+                <div class="mb-3">
+                    <label asp-for="RouteName" class="form-label">
+                        Route Name
+                    </label>
+
+                    <input asp-for="RouteName"
+                           class="form-control"
+                           placeholder="Enter route name" />
+
+                    <span asp-validation-for="RouteName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RouteDescription" class="form-label">
+                        Route Description
+                    </label>
+
+                    <textarea asp-for="RouteDescription"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Describe the event route"></textarea>
+
+                    <span asp-validation-for="RouteDescription"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RouteLocation" class="form-label">
+                        Route Location
+                    </label>
+
+                    <input asp-for="RouteLocation"
+                           class="form-control"
+                           placeholder="Enter route location" />
+
+                    <span asp-validation-for="RouteLocation"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="RouteUrl" class="form-label">
+                        Route URL
+                    </label>
+
+                    <input asp-for="RouteUrl"
+                           class="form-control"
+                           placeholder="https://example.com/route" />
+
+                    <span asp-validation-for="RouteUrl"
+                          class="text-danger"></span>
+
+                    <small class="text-muted">
+                        Enter a link to the route map or route information.
+                    </small>
+                </div>
+
+                <div class="d-flex gap-2">
+
+                    <button type="submit" class="btn btn-primary">
+                        Create Route
+                    </button>
+
+                    <a asp-controller="Organiser"
+                       asp-action="ManageRoutes"
+                       asp-route-eventId="@ViewBag.EventId"
+                       class="btn btn-outline-secondary">
+                        Cancel
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
