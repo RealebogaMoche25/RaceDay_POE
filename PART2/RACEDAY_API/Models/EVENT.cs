@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 
 namespace RACEDAY_API.Models
 {
@@ -18,7 +19,7 @@ namespace RACEDAY_API.Models
 
         public string EventType { get; set; } = string.Empty;
 
-        public string BannerImageUrl { get; set; } = string.Empty;
+        public string? BannerImageUrl { get; set; }
 
         public int OrganiserId { get; set; }
     }
