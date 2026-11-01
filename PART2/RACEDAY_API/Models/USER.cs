@@ -18,6 +18,6 @@ namespace RACEDAY_API.Models
 
         public string PhoneNumber { get; set; } = string.Empty;
 
-        public string ProfilePictureUrl { get; set; } = string.Empty;
+        public string? ProfilePictureUrl { get; set; }
     }
 }

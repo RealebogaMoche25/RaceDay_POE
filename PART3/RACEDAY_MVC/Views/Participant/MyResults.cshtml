@@ -1,0 +1,84 @@
+﻿@model List<RaceDay.Web.ViewModels.MyResultViewModel>
+
+@{
+    ViewData["Title"] = "My Results";
+}
+
+<div class="container mt-4">
+
+    <div class="mb-4">
+        <h2>My Race Results</h2>
+        <p class="text-muted">
+            View your finishing times and positions across your completed events.
+        </p>
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Event</th>
+                        <th>Event Date</th>
+                        <th>Location</th>
+                        <th>Finish Time</th>
+                        <th>Finishing Position</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @foreach (var result in Model.OrderByDescending(r => r.EventDate))
+                    {
+                        <tr>
+                            <td>
+                                <strong>@result.EventName</strong>
+                            </td>
+
+                            <td>
+                                @result.EventDate.ToString("dd MMM yyyy")
+                            </td>
+
+                            <td>
+                                @result.EventLocation
+                            </td>
+
+                            <td>
+                                @result.FinishTime.ToString(@"hh\:mm\:ss")
+                            </td>
+
+                            <td>
+                                <span class="badge bg-primary">
+                                    @result.FinishingPosition
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            You don't have any race results available yet.
+            Your results will appear here once an organiser records them.
+        </div>
+    }
+
+    <a asp-controller="Participant"
+       asp-action="MyEvents"
+       class="btn btn-outline-secondary mt-3">
+        Back to My Events
+    </a>
+
+</div>

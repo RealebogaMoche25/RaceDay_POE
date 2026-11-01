@@ -56,20 +56,19 @@ namespace RACEDAY_API.Controllers
             });
         }
 
-        /// <summary>
-        /// Updates the profile information of the authenticated user.
-        /// </summary>
-        // PUT: api/users/me
         [HttpPut("me")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult UpdateProfile(User updatedUser)
         {
+            Console.WriteLine("PROFILE UPDATE REQUEST RECEIVED");
+
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
             if (userIdClaim == null)
             {
+                Console.WriteLine("USER ID CLAIM NOT FOUND");
                 return Unauthorized();
             }
 
@@ -79,8 +78,15 @@ namespace RACEDAY_API.Controllers
 
             if (user == null)
             {
+                Console.WriteLine("USER NOT FOUND");
                 return NotFound("User not found.");
             }
+
+            Console.WriteLine($"Updating user ID: {userId}");
+            Console.WriteLine($"New first name: {updatedUser.FirstName}");
+            Console.WriteLine($"New last name: {updatedUser.LastName}");
+            Console.WriteLine($"New email: {updatedUser.Email}");
+            Console.WriteLine($"New phone: {updatedUser.PhoneNumber}");
 
             user.FirstName = updatedUser.FirstName;
             user.LastName = updatedUser.LastName;
@@ -88,6 +94,8 @@ namespace RACEDAY_API.Controllers
             user.PhoneNumber = updatedUser.PhoneNumber;
 
             _context.SaveChanges();
+
+            Console.WriteLine("PROFILE UPDATE SAVED SUCCESSFULLY");
 
             return Ok(new
             {

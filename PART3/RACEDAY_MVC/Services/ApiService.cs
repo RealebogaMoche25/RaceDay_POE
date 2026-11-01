@@ -464,5 +464,67 @@ namespace RaceDay.Web.Services
             }
         }
 
+
+        public async Task<List<ResultViewModel>> GetMyResultsAsync()
+        {
+            var client = CreateApiClient();
+
+            var response = await client.GetAsync("api/results/mine");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to retrieve your results. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<List<ResultViewModel>>()
+                   ?? new List<ResultViewModel>();
+        }
+
+
+        // Retrieve the logged-in user's profile
+        public async Task<ProfileViewModel?> GetMyProfileAsync()
+        {
+            var client = CreateApiClient();
+
+            var response = await client.GetAsync("api/users/me");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to retrieve your profile. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<ProfileViewModel>();
+        }
+
+
+        // Update the logged-in user's profile
+        public async Task<ProfileViewModel?> UpdateMyProfileAsync(
+            ProfileViewModel model)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.PutAsJsonAsync(
+                "api/users/me", model);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine($"PROFILE UPDATE API ERROR: {response.StatusCode} - {error}");
+
+                throw new HttpRequestException(
+                    $"Unable to update your profile. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<ProfileViewModel>();
+        }
+
+
     }
 }
