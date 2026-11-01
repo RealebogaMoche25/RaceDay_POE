@@ -10,5 +10,6 @@
         public string CategoryName { get; set; } = string.Empty;
         public string EnrolmentStatus { get; set; } = string.Empty;
         public DateTime EnrolmentDate { get; set; }
+
     }
 }

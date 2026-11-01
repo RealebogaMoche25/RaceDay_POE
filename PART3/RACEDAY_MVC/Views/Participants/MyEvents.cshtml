@@ -1,0 +1,117 @@
+﻿@model List<RaceDay.Web.ViewModels.MyEventViewModel>
+
+@{
+    ViewData["Title"] = "My Events";
+}
+
+<div class="container py-5">
+
+    <div class="mb-4">
+        <h1 class="fw-bold">My Events</h1>
+        <p class="text-muted">
+            View the events you have registered for and your enrolment details.
+        </p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center py-5">
+                <h4 class="fw-semibold">No Enrolled Events Yet</h4>
+                <p class="text-muted">
+                    You haven't enrolled in any events. Browse the available
+                    events and find one you'd like to participate in.
+                </p>
+
+                <a asp-controller="Events"
+                   asp-action="Index"
+                   class="btn btn-primary">
+                    Browse Events
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+
+            @foreach (var item in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+
+                    <div class="card h-100 border-0 shadow-sm">
+
+                        <div class="card-body p-4">
+
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-success">
+                                    @item.EnrolmentStatus
+                                </span>
+
+                                <small class="text-muted">
+                                    Enrolment #@item.EnrolmentId
+                                </small>
+                            </div>
+
+                            <h5 class="card-title fw-bold">
+                                @item.EventName
+                            </h5>
+
+                            <p class="text-muted mb-2">
+                                <strong>Date:</strong>
+                                @item.EventDate.ToString("dd MMMM yyyy")
+                            </p>
+
+                            <p class="text-muted mb-2">
+                                <strong>Location:</strong>
+                                @item.EventLocation
+                            </p>
+
+                            <p class="text-muted mb-2">
+                                <strong>Category:</strong>
+                                @item.CategoryName
+                            </p>
+
+                            <p class="text-muted mb-3">
+                                <strong>Enrolled on:</strong>
+                                @item.EnrolmentDate.ToString("dd MMMM yyyy")
+                            </p>
+
+                            <a asp-controller="Events"
+                               asp-action="Details"
+                               asp-route-id="@item.EventId"
+                               class="btn btn-outline-primary w-100">
+                                View Event
+                            </a>
+
+                        </div>
+                    </div>
+
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
