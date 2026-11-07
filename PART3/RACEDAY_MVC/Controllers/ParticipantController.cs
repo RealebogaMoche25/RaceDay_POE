@@ -90,6 +90,17 @@ namespace RaceDay.Web.Controllers
                         continue;
                     }
 
+                    // Retrieve the event categories.
+                    var categories = await _apiService.GetEventCategoriesAsync(
+                        raceEvent.EventId);
+
+                    // Find the participant's selected category.
+                    var category = categories.FirstOrDefault(
+                        c => c.CategoryId == enrolment.CategoryId);
+
+                    var totalFinishers = await _apiService.GetEventFinisherCountAsync(
+    raceEvent.EventId);
+
                     myResults.Add(new MyResultViewModel
                     {
                         ResultId = result.ResultId,
@@ -97,8 +108,10 @@ namespace RaceDay.Web.Controllers
                         EventName = raceEvent.EventName,
                         EventDate = raceEvent.EventDate,
                         EventLocation = raceEvent.EventLocation,
+                        CategoryName = category?.CategoryName ?? "Not specified",
                         FinishTime = result.FinishTime,
-                        FinishingPosition = result.FinishingPosition
+                        FinishingPosition = result.FinishingPosition,
+                        TotalFinishers = totalFinishers
                     });
                 }
 
@@ -112,7 +125,6 @@ namespace RaceDay.Web.Controllers
                 return View(new List<MyResultViewModel>());
             }
         }
-
 
         [HttpGet]
         public async Task<IActionResult> MyProfile()

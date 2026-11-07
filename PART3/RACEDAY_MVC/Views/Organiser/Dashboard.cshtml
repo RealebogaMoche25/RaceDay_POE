@@ -1,4 +1,7 @@
-﻿@{
+﻿@model RaceDay.Web.ViewModels.OrganiserDashboardViewModel
+
+
+@{
     ViewData["Title"] = "Organiser Dashboard";
 }
 
@@ -11,6 +14,61 @@
             Manage your events, categories, participants and race results.
         </p>
     </div>
+
+    <!-- Dashboard Summary -->
+<div class="row g-3 mb-4">
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Total Events</h6>
+                <h2 class="fw-bold">@Model.TotalEvents</h2>
+                <p class="mb-0">Events created</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Total Enrolments</h6>
+                <h2 class="fw-bold">@Model.TotalEnrolments</h2>
+                <p class="mb-0">Across your events</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Upcoming Events</h6>
+                <h2 class="fw-bold">@Model.UpcomingEvents</h2>
+                <p class="mb-0">Events still to take place</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <h6 class="text-muted">Next Upcoming Event</h6>
+                <h5 class="fw-bold">@Model.NextEventName</h5>
+
+                @if (Model.NextEventDate.HasValue)
+                {
+                    <p class="mb-0">
+                        @Model.NextEventDate.Value.ToString("dd MMMM yyyy")
+                    </p>
+                }
+                else
+                {
+                    <p class="mb-0">No upcoming event scheduled</p>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
 
     <div class="row g-4">
 

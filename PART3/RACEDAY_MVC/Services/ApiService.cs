@@ -484,6 +484,25 @@ namespace RaceDay.Web.Services
         }
 
 
+        public async Task<int> GetEventFinisherCountAsync(int eventId)
+        {
+            var client = CreateApiClient();
+
+            var response = await client.GetAsync(
+                $"api/events/{eventId}/results/count");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to retrieve event finisher count. Status: {response.StatusCode}. {error}");
+            }
+
+            return await response.Content.ReadFromJsonAsync<int>();
+        }
+
+
         // Retrieve the logged-in user's profile
         public async Task<ProfileViewModel?> GetMyProfileAsync()
         {

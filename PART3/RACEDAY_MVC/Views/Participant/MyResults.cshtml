@@ -1,4 +1,5 @@
-﻿@model List<RaceDay.Web.ViewModels.MyResultViewModel>
+﻿```cshtml
+@model List<RaceDay.Web.ViewModels.MyResultViewModel>
 
 @{
     ViewData["Title"] = "My Results";
@@ -7,9 +8,9 @@
 <div class="container mt-4">
 
     <div class="mb-4">
-        <h2>My Race Results</h2>
+        <h2 class="fw-bold">My Race Results</h2>
         <p class="text-muted">
-            View your finishing times and positions across your completed events.
+            View your finishing times, categories and positions across your completed events.
         </p>
     </div>
 
@@ -30,6 +31,7 @@
                         <th>Event</th>
                         <th>Event Date</th>
                         <th>Location</th>
+                        <th>Category</th>
                         <th>Finish Time</th>
                         <th>Finishing Position</th>
                     </tr>
@@ -52,6 +54,10 @@
                             </td>
 
                             <td>
+                                @result.CategoryName
+                            </td>
+
+                            <td>
                                 @result.FinishTime.ToString(@"hh\:mm\:ss")
                             </td>
 
@@ -59,6 +65,13 @@
                                 <span class="badge bg-primary">
                                     @result.FinishingPosition
                                 </span>
+
+                                @if (result.TotalFinishers > 0)
+                                {
+                                    <div class="small text-muted mt-1">
+                                        out of @result.TotalFinishers finishers
+                                    </div>
+                                }
                             </td>
                         </tr>
                     }
@@ -82,3 +95,4 @@
     </a>
 
 </div>
+```

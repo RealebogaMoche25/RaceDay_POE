@@ -16,9 +16,50 @@ namespace RaceDay.Web.Controllers
             _apiService = apiService;
         }
 
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
-            return View();
+            try
+            {
+                // Get all events from the API.
+                var events = await _apiService.GetEventsAsync();
+
+                // Only include events belonging to the logged-in organiser.
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                var organiserEvents = events
+                    .Where(e => e.OrganiserId == organiserId)
+                    .ToList();
+
+                // Get upcoming events.
+                var upcomingEvents = organiserEvents
+                    .Where(e => e.EventDate >= DateTime.Today)
+                    .OrderBy(e => e.EventDate)
+                    .ToList();
+
+                // Calculate dashboard statistics.
+                var model = new OrganiserDashboardViewModel
+                {
+                    TotalEvents = organiserEvents.Count,
+                    UpcomingEvents = upcomingEvents.Count,
+                    NextEventName = upcomingEvents.FirstOrDefault()?.EventName
+                        ?? "No upcoming events",
+                    NextEventDate = upcomingEvents.FirstOrDefault()?.EventDate
+                };
+
+                // Count enrolments across the organiser's events.
+                foreach (var eventItem in organiserEvents)
+                {
+                    var enrolments = await _apiService.GetEventEnrolmentsAsync(eventItem.EventId);
+                    model.TotalEnrolments += enrolments.Count;
+                }
+
+                return View(model);
+            }
+            catch (HttpRequestException)
+            {
+                TempData["ErrorMessage"] = "Unable to load dashboard information. Please try again.";
+                return View(new OrganiserDashboardViewModel());
+            }
         }
 
         [HttpGet]

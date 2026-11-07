@@ -15,5 +15,9 @@
         public TimeSpan FinishTime { get; set; }
 
         public int FinishingPosition { get; set; }
+
+        public string CategoryName { get; set; } = "Not specified";
+
+        public int TotalFinishers { get; set; }
     }
 }

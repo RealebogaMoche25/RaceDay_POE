@@ -155,6 +155,33 @@ namespace RACEDAY_API.Controllers
         }
 
         /// <summary>
+        /// Retrieves the total number of recorded finishers for an event.
+        /// Participants can access this aggregate count.
+        /// </summary>
+        // GET: api/events/{eventId}/results/count
+        [Authorize(Roles = "Participant")]
+        [HttpGet("api/events/{eventId}/results/count")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public IActionResult GetEventFinisherCount(int eventId)
+        {
+            var eventItem = _context.Events.Find(eventId);
+
+            if (eventItem == null)
+            {
+                return NotFound("Event not found.");
+            }
+
+            var totalFinishers = _context.Results
+                .Count(r => _context.Enrolments
+                    .Any(e => e.EnrolmentId == r.EnrolmentId
+                          && e.EventId == eventId));
+
+            return Ok(totalFinishers);
+        }
+
+        /// <summary>
         /// Retrieves all results for an event. Only the Organiser who owns the event can view its results.
         /// </summary>
         // GET: api/events/{eventId}/results
