@@ -1,0 +1,146 @@
+﻿
+@model List<RaceDay.Web.ViewModels.MyEventViewModel>
+
+@{
+    ViewData["Title"] = "My Events";
+    var events = Model ?? new List<RaceDay.Web.ViewModels.MyEventViewModel>();
+}
+
+<div class="rd-participant-events-page">
+
+    <section class="rd-participant-events-hero">
+        <div>
+            <span class="rd-participant-eyebrow">YOUR RACE JOURNEY</span>
+            <h1>My Events</h1>
+            <p>
+                Keep track of the races you've joined, your enrolment details
+                and the challenges ahead.
+            </p>
+        </div>
+
+        <div class="rd-participant-events-total">
+            <strong>@events.Count</strong>
+            <span>@(events.Count == 1 ? "Enrolled Event" : "Enrolled Events")</span>
+        </div>
+    </section>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger">
+            @ViewBag.ErrorMessage
+        </div>
+    }
+
+    <section class="rd-participant-events-content">
+
+        <div class="rd-participant-events-heading">
+            <div>
+                <span class="rd-participant-section-eyebrow">YOUR COMMITMENTS</span>
+                <h2>Registered Events</h2>
+                <p>All your race registrations in one place.</p>
+            </div>
+
+            <a asp-controller="Events"
+               asp-action="Index"
+               class="btn rd-participant-browse-btn">
+                Discover More Events
+            </a>
+        </div>
+
+        @if (!events.Any())
+        {
+            <div class="rd-participant-events-empty">
+                <div class="rd-participant-empty-icon">R</div>
+                <h3>No enrolled events yet</h3>
+                <p>
+                    You haven't registered for an event yet.
+                    Explore the available races and find your next challenge.
+                </p>
+
+                <a asp-controller="Events"
+                   asp-action="Index"
+                   class="btn rd-participant-browse-btn">
+                    Browse Available Events
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="rd-participant-event-grid">
+
+                @foreach (var item in events)
+                {
+                    <article class="rd-participant-event-card">
+
+                        <div class="rd-participant-event-card-top">
+                            <span class="rd-participant-event-label">
+                                RACE REGISTRATION
+                            </span>
+
+                            <span class="rd-participant-status">
+                                @item.EnrolmentStatus
+                            </span>
+                        </div>
+
+                        <div class="rd-participant-event-card-body">
+
+                            <h3>@item.EventName</h3>
+
+                            <div class="rd-participant-event-detail">
+                                <span class="rd-participant-detail-label">EVENT DATE</span>
+                                <strong>@item.EventDate.ToString("dd MMMM yyyy")</strong>
+                            </div>
+
+                            <div class="rd-participant-event-detail">
+                                <span class="rd-participant-detail-label">LOCATION</span>
+                                <strong>@item.EventLocation</strong>
+                            </div>
+
+                            <div class="rd-participant-event-detail">
+                                <span class="rd-participant-detail-label">CATEGORY</span>
+                                <strong>@item.CategoryName</strong>
+                            </div>
+
+                            <div class="rd-participant-event-detail">
+                                <span class="rd-participant-detail-label">ENROLMENT DATE</span>
+                                <strong>@item.EnrolmentDate.ToString("dd MMMM yyyy")</strong>
+                            </div>
+
+                        </div>
+
+                        <div class="rd-participant-event-card-footer">
+                            <span class="rd-participant-enrolment-number">
+                                Enrolment #@item.EnrolmentId
+                            </span>
+
+                            <a asp-controller="Events"
+                               asp-action="Details"
+                               asp-route-id="@item.EventId"
+                               class="btn rd-participant-view-btn">
+                                View Event
+                            </a>
+                        </div>
+
+                    </article>
+                }
+
+            </div>
+        }
+
+    </section>
+
+</div>

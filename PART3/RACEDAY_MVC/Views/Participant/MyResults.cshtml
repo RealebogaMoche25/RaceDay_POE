@@ -1,18 +1,28 @@
-﻿```cshtml
+﻿
 @model List<RaceDay.Web.ViewModels.MyResultViewModel>
 
 @{
     ViewData["Title"] = "My Results";
+    var results = Model ?? new List<RaceDay.Web.ViewModels.MyResultViewModel>();
 }
 
-<div class="container mt-4">
+<div class="rd-my-results-page">
 
-    <div class="mb-4">
-        <h2 class="fw-bold">My Race Results</h2>
-        <p class="text-muted">
-            View your finishing times, categories and positions across your completed events.
-        </p>
-    </div>
+    <section class="rd-my-results-hero">
+        <div>
+            <span class="rd-my-results-eyebrow">YOUR RACING PERFORMANCE</span>
+            <h1>My Race Results</h1>
+            <p>
+                Look back at your race performances, track your finishing
+                positions and celebrate every milestone.
+            </p>
+        </div>
+
+        <div class="rd-results-total">
+            <strong>@results.Count</strong>
+            <span>@(results.Count == 1 ? "Recorded Result" : "Recorded Results")</span>
+        </div>
+    </section>
 
     @if (ViewBag.ErrorMessage != null)
     {
@@ -21,78 +31,108 @@
         </div>
     }
 
-    @if (Model != null && Model.Any())
-    {
-        <div class="table-responsive">
-            <table class="table table-bordered table-hover align-middle">
+    <section class="rd-my-results-content">
 
-                <thead class="table-dark">
-                    <tr>
-                        <th>Event</th>
-                        <th>Event Date</th>
-                        <th>Location</th>
-                        <th>Category</th>
-                        <th>Finish Time</th>
-                        <th>Finishing Position</th>
-                    </tr>
-                </thead>
+        <div class="rd-my-results-heading">
+            <div>
+                <span class="rd-my-results-section-eyebrow">PERFORMANCE HISTORY</span>
+                <h2>Your Results</h2>
+                <p>Your recorded results, starting with your most recent event.</p>
+            </div>
 
-                <tbody>
-                    @foreach (var result in Model.OrderByDescending(r => r.EventDate))
-                    {
-                        <tr>
-                            <td>
-                                <strong>@result.EventName</strong>
-                            </td>
+            <a asp-controller="Participant"
+               asp-action="MyEvents"
+               class="btn rd-results-back-btn">
+                My Events
+            </a>
+        </div>
 
-                            <td>
-                                @result.EventDate.ToString("dd MMM yyyy")
-                            </td>
+        @if (results.Any())
+        {
+            <div class="rd-results-grid">
 
-                            <td>
-                                @result.EventLocation
-                            </td>
+                @foreach (var result in results.OrderByDescending(r => r.EventDate))
+                {
+                    <article class="rd-result-card">
 
-                            <td>
-                                @result.CategoryName
-                            </td>
+                        <div class="rd-result-card-top">
+                            <span class="rd-result-event-label">COMPLETED EVENT</span>
+                            <span class="rd-result-position-badge">
+                                Position #@result.FinishingPosition
+                            </span>
+                        </div>
 
-                            <td>
-                                @result.FinishTime.ToString(@"hh\:mm\:ss")
-                            </td>
+                        <div class="rd-result-card-body">
 
-                            <td>
-                                <span class="badge bg-primary">
-                                    @result.FinishingPosition
-                                </span>
+                            <h3>@result.EventName</h3>
 
-                                @if (result.TotalFinishers > 0)
-                                {
-                                    <div class="small text-muted mt-1">
-                                        out of @result.TotalFinishers finishers
+                            <div class="rd-result-event-meta">
+                                <span>@result.EventDate.ToString("dd MMMM yyyy")</span>
+                                <span class="rd-result-meta-divider">|</span>
+                                <span>@result.EventLocation</span>
+                            </div>
+
+                            <div class="rd-result-time-panel">
+                                <span class="rd-result-detail-label">FINISH TIME</span>
+                                <strong>@result.FinishTime.ToString(@"hh\:mm\:ss")</strong>
+                            </div>
+
+                            <div class="rd-result-information">
+                                <div class="rd-result-information-item">
+                                    <span class="rd-result-detail-label">CATEGORY</span>
+                                    <strong>@result.CategoryName</strong>
+                                </div>
+
+                                <div class="rd-result-information-item">
+                                    <span class="rd-result-detail-label">FINISHING POSITION</span>
+                                    <strong>#@result.FinishingPosition</strong>
+                                </div>
+                            </div>
+
+                            @if (result.TotalFinishers > 0)
+                            {
+                                <div class="rd-result-field">
+                                    <div class="rd-result-field-heading">
+                                        <span>Race field</span>
+                                        <strong>@result.FinishingPosition of @result.TotalFinishers</strong>
                                     </div>
-                                }
-                            </td>
-                        </tr>
-                    }
-                </tbody>
 
-            </table>
-        </div>
-    }
-    else
-    {
-        <div class="alert alert-info">
-            You don't have any race results available yet.
-            Your results will appear here once an organiser records them.
-        </div>
-    }
+                                    <div class="rd-result-field-track">
+                                        <div class="rd-result-field-progress"
+                                             style="width: @(Math.Clamp((double)result.FinishingPosition / result.TotalFinishers * 100, 0, 100))%">
+                                        </div>
+                                    </div>
 
-    <a asp-controller="Participant"
-       asp-action="MyEvents"
-       class="btn btn-outline-secondary mt-3">
-        Back to My Events
-    </a>
+                                    <small>Finishing position out of all recorded finishers</small>
+                                </div>
+                            }
+
+                        </div>
+
+                    </article>
+                }
+
+            </div>
+        }
+        else
+        {
+            <div class="rd-results-empty">
+                <div class="rd-results-empty-icon">R</div>
+                <h3>No race results available yet</h3>
+                <p>
+                    Your race results will appear here once an organiser
+                    records your finishing time and position.
+                    Keep participating and your performance history will grow.
+                </p>
+
+                <a asp-controller="Participant"
+                   asp-action="MyEvents"
+                   class="btn rd-results-back-btn">
+                    View My Events
+                </a>
+            </div>
+        }
+
+    </section>
 
 </div>
-```
