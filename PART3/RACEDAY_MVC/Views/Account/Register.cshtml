@@ -1,93 +1,191 @@
-﻿
-@model RACEDAY_MVC.ViewModels.RegisterViewModel
+﻿@model RaceDay.Web.ViewModels.RegisterViewModel
 
 @{
     ViewData["Title"] = "Register";
 }
 
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4 p-md-5">
+<div class="rd-auth-page">
+    <div class="rd-auth-card rd-register-card">
 
-                    <h1 class="h3 fw-bold mb-2">Create Your RaceDay Account</h1>
-                    <p class="text-muted mb-4">
-                        Join RaceDay and get ready for your next event.
-                    </p>
+        <!-- LEFT: SPORTING IMAGE PANEL -->
+        <div class="rd-auth-visual rd-register-visual">
+            <div class="rd-auth-visual-overlay"></div>
 
-                    <form asp-controller="Account"
-                          asp-action="Register"
-                          method="post">
+            <div class="rd-auth-visual-content">
+                <span class="rd-auth-eyebrow">YOUR RACE STARTS HERE</span>
 
-                        @Html.AntiForgeryToken()
+                <h1>
+                    Find your<br />
+                    pace.<br />
+                    <span>Own your race.</span>
+                </h1>
 
-                        <div asp-validation-summary="ModelOnly"
-                             class="text-danger mb-3"></div>
+                <p>
+                    Discover exciting sporting events, challenge
+                    yourself and become part of the RaceDay community.
+                </p>
 
-                        <div class="mb-3">
-                            <label asp-for="FirstName" class="form-label"></label>
-                            <input asp-for="FirstName" class="form-control" />
-                            <span asp-validation-for="FirstName"
-                                  class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="LastName" class="form-label"></label>
-                            <input asp-for="LastName" class="form-control" />
-                            <span asp-validation-for="LastName"
-                                  class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Email" class="form-label"></label>
-                            <input asp-for="Email" class="form-control" />
-                            <span asp-validation-for="Email"
-                                  class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="Password" class="form-label"></label>
-                            <input asp-for="Password" class="form-control" />
-                            <span asp-validation-for="Password"
-                                  class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-3">
-                            <label asp-for="PhoneNumber" class="form-label"></label>
-                            <input asp-for="PhoneNumber" class="form-control" />
-                            <span asp-validation-for="PhoneNumber"
-                                  class="text-danger"></span>
-                        </div>
-
-                        <div class="mb-4">
-                            <label asp-for="Role" class="form-label"></label>
-                            <select asp-for="Role" class="form-select">
-                                <option value="Participant">Participant</option>
-                                <option value="Organiser">Organiser</option>
-                            </select>
-                            <span asp-validation-for="Role"
-                                  class="text-danger"></span>
-                        </div>
-
-                        <button type="submit"
-                                class="btn btn-primary w-100">
-                            Create Account
-                        </button>
-
-                        <p class="text-center mt-3 mb-0">
-                            Already registered?
-                            <a asp-controller="Account"
-                               asp-action="Login">Log in</a>
-                        </p>
-                    </form>
+                <div class="rd-auth-visual-footer">
+                    <span class="rd-auth-line"></span>
+                    <span>DISCOVER. REGISTER. COMPETE.</span>
                 </div>
             </div>
         </div>
+
+        <!-- RIGHT: REGISTRATION FORM -->
+        <div class="rd-auth-form-panel rd-register-form-panel">
+            <div class="rd-auth-form-content">
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="rd-auth-brand">
+                    RACE<span>DAY</span>
+                </a>
+
+                <div class="rd-auth-heading">
+                    <span class="rd-auth-kicker">JOIN THE COMMUNITY</span>
+                    <h2>Create your account.</h2>
+                    <p>Get started and prepare for your next challenge.</p>
+                </div>
+
+                <form asp-controller="Account"
+                      asp-action="Register"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger rd-validation-summary mb-3">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6 mb-3">
+                            <label asp-for="FirstName"
+                                   class="form-label rd-auth-label">
+                            </label>
+
+                            <input asp-for="FirstName"
+                                   class="form-control rd-auth-input"
+                                   placeholder="First name"
+                                   autocomplete="given-name" />
+
+                            <span asp-validation-for="FirstName"
+                                  class="text-danger">
+                            </span>
+                        </div>
+
+                        <div class="col-sm-6 mb-3">
+                            <label asp-for="LastName"
+                                   class="form-label rd-auth-label">
+                            </label>
+
+                            <input asp-for="LastName"
+                                   class="form-control rd-auth-input"
+                                   placeholder="Last name"
+                                   autocomplete="family-name" />
+
+                            <span asp-validation-for="LastName"
+                                  class="text-danger">
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email"
+                               class="form-label rd-auth-label">
+                        </label>
+
+                        <input asp-for="Email"
+                               class="form-control rd-auth-input"
+                               placeholder="Enter your email address"
+                               autocomplete="email" />
+
+                        <span asp-validation-for="Email"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Password"
+                               class="form-label rd-auth-label">
+                        </label>
+
+                        <input asp-for="Password"
+                               class="form-control rd-auth-input"
+                               placeholder="Create a password"
+                               autocomplete="new-password" />
+
+                        <span asp-validation-for="Password"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PhoneNumber"
+                               class="form-label rd-auth-label">
+                        </label>
+
+                        <input asp-for="PhoneNumber"
+                               class="form-control rd-auth-input"
+                               placeholder="Enter your phone number"
+                               autocomplete="tel" />
+
+                        <span asp-validation-for="PhoneNumber"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Role"
+                               class="form-label rd-auth-label">
+                        </label>
+
+                        <select asp-for="Role"
+                                class="form-select rd-auth-input">
+                            <option value="Participant">Participant</option>
+                            <option value="Organiser">Organiser</option>
+                        </select>
+
+                        <span asp-validation-for="Role"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <button type="submit"
+                            class="btn rd-auth-submit w-100">
+                        Create Account
+                        <span aria-hidden="true">→</span>
+                    </button>
+
+                    <div class="rd-auth-divider">
+                        <span></span>
+                        <small>ALREADY PART OF RACEDAY?</small>
+                        <span></span>
+                    </div>
+
+                    <p class="rd-auth-register">
+                        Already registered?
+                        <a asp-controller="Account"
+                           asp-action="Login">
+                            Log in here
+                        </a>
+                    </p>
+
+                </form>
+
+                <div class="rd-auth-bottom">
+                    <a asp-controller="Home"
+                       asp-action="Index">
+                        ← Back to homepage
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
     </div>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
-

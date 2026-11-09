@@ -1,175 +1,253 @@
-﻿@model RaceDay.Web.ViewModels.OrganiserDashboardViewModel
-
+﻿```cshtml
+@model RaceDay.Web.ViewModels.OrganiserDashboardViewModel
 
 @{
     ViewData["Title"] = "Organiser Dashboard";
 }
 
-<div class="container py-5">
+<div class="rd-dashboard-page">
 
-    <div class="mb-5">
-        <h1 class="fw-bold">Organiser Dashboard</h1>
-        <p class="text-muted">
-            Welcome to your RaceDay organiser portal.
-            Manage your events, categories, participants and race results.
-        </p>
-    </div>
+    <!-- Dashboard Welcome -->
+    <section class="rd-dashboard-hero">
+        <div class="rd-dashboard-hero-content">
+            <span class="rd-dashboard-eyebrow">RACEDAY SA | ORGANISER PORTAL</span>
 
-    <!-- Dashboard Summary -->
-<div class="row g-3 mb-4">
+            <h1>Take control of<br />your next race.</h1>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="text-muted">Total Events</h6>
-                <h2 class="fw-bold">@Model.TotalEvents</h2>
-                <p class="mb-0">Events created</p>
-            </div>
+            <p>
+                Your event management hub. Create events, manage participants,
+                organise race routes and keep track of results.
+            </p>
+
+            <a asp-controller="Organiser"
+               asp-action="CreateEvent"
+               class="rd-dashboard-primary-btn">
+                + Create New Event
+            </a>
         </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="text-muted">Total Enrolments</h6>
-                <h2 class="fw-bold">@Model.TotalEnrolments</h2>
-                <p class="mb-0">Across your events</p>
-            </div>
+        <div class="rd-dashboard-hero-decoration">
+            <span class="rd-dashboard-number">01</span>
+            <span class="rd-dashboard-decoration-line"></span>
+            <span class="rd-dashboard-decoration-text">PLAN. ORGANISE. DELIVER.</span>
         </div>
-    </div>
+    </section>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="text-muted">Upcoming Events</h6>
-                <h2 class="fw-bold">@Model.UpcomingEvents</h2>
-                <p class="mb-0">Events still to take place</p>
+    <!-- Dashboard Statistics -->
+    <section class="rd-dashboard-stats-section">
+
+        <div class="rd-dashboard-section-heading">
+            <div>
+                <span class="rd-section-eyebrow">YOUR PERFORMANCE</span>
+                <h2>Dashboard overview</h2>
             </div>
-        </div>
-    </div>
 
-    <div class="col-md-3">
-        <div class="card shadow-sm h-100">
-            <div class="card-body">
-                <h6 class="text-muted">Next Upcoming Event</h6>
-                <h5 class="fw-bold">@Model.NextEventName</h5>
+            <span class="rd-dashboard-live-label">
+                ORGANISER SUMMARY
+            </span>
+        </div>
+
+        <div class="rd-dashboard-stats-grid">
+
+            <div class="rd-stat-card">
+                <div class="rd-stat-card-top">
+                    <span>Total Events</span>
+                    <span class="rd-stat-icon">01</span>
+                </div>
+                <h3>@Model.TotalEvents</h3>
+                <p>Events created</p>
+                <div class="rd-stat-accent"></div>
+            </div>
+
+            <div class="rd-stat-card">
+                <div class="rd-stat-card-top">
+                    <span>Total Enrolments</span>
+                    <span class="rd-stat-icon">02</span>
+                </div>
+                <h3>@Model.TotalEnrolments</h3>
+                <p>Across your events</p>
+                <div class="rd-stat-accent"></div>
+            </div>
+
+            <div class="rd-stat-card">
+                <div class="rd-stat-card-top">
+                    <span>Upcoming Events</span>
+                    <span class="rd-stat-icon">03</span>
+                </div>
+                <h3>@Model.UpcomingEvents</h3>
+                <p>Events still to take place</p>
+                <div class="rd-stat-accent"></div>
+            </div>
+
+            <div class="rd-stat-card rd-next-event-card">
+                <div class="rd-stat-card-top">
+                    <span>Next Upcoming Event</span>
+                    <span class="rd-stat-icon rd-next-icon">04</span>
+                </div>
+
+                <h3 class="rd-next-event-name">
+                    @(string.IsNullOrWhiteSpace(Model.NextEventName)
+                        ? "No event scheduled"
+                        : Model.NextEventName)
+                </h3>
 
                 @if (Model.NextEventDate.HasValue)
                 {
-                    <p class="mb-0">
-                        @Model.NextEventDate.Value.ToString("dd MMMM yyyy")
-                    </p>
+                    <p>@Model.NextEventDate.Value.ToString("dd MMMM yyyy")</p>
                 }
                 else
                 {
-                    <p class="mb-0">No upcoming event scheduled</p>
+                    <p>Create an event to get started</p>
                 }
+
+                <div class="rd-stat-accent"></div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Management Tools -->
+    <section class="rd-dashboard-management">
+
+        <div class="rd-dashboard-section-heading">
+            <div>
+                <span class="rd-section-eyebrow">EVENT OPERATIONS</span>
+                <h2>Manage your RaceDay</h2>
+                <p>Everything you need to organise a successful sporting event.</p>
             </div>
         </div>
-    </div>
 
-</div>
+        <div class="rd-management-grid">
 
-    <div class="row g-4">
+            <!-- Events -->
+            <article class="rd-management-card rd-management-featured">
+                <div class="rd-management-card-top">
+                    <span class="rd-management-number">01 / EVENTS</span>
+                    <span class="rd-management-icon">E</span>
+                </div>
 
-        <div class="col-md-6 col-lg-4">
-            <div class="card border-0 shadow-sm h-100">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold">Manage Events</h5>
-                    <p class="text-muted">
-                        Create, update and manage your sporting events.
-                    </p>
+                <h3>Manage Events</h3>
+
+                <p>
+                    Create new sporting events, update event information
+                    and manage your existing race listings.
+                </p>
+
+                <div class="rd-management-actions">
                     <a asp-controller="Organiser"
                        asp-action="ManageEvents"
-                       class="btn btn-primary">
+                       class="rd-management-btn">
                         Manage Events
                     </a>
+
                     <a asp-controller="Organiser"
                        asp-action="CreateEvent"
-                       class="btn btn-outline-primary ms-2">
-                        Create Event
+                       class="rd-management-secondary">
+                        Create Event <span aria-hidden="true">&rarr;</span>
                     </a>
                 </div>
-            </div>
+            </article>
+
+            <!-- Categories -->
+            <article class="rd-management-card">
+                <div class="rd-management-card-top">
+                    <span class="rd-management-number">02 / CATEGORIES</span>
+                    <span class="rd-management-icon">C</span>
+                </div>
+
+                <h3>Manage Categories</h3>
+
+                <p>
+                    Organise race divisions and create categories
+                    suited to different participants and distances.
+                </p>
+
+                <a asp-controller="Organiser"
+                   asp-action="ManageEvents"
+                   class="rd-management-link">
+                    Select Event <span aria-hidden="true">&rarr;</span>
+                </a>
+            </article>
+
+            <!-- Enrolments -->
+            <article class="rd-management-card">
+                <div class="rd-management-card-top">
+                    <span class="rd-management-number">03 / ENROLMENTS</span>
+                    <span class="rd-management-icon">P</span>
+                </div>
+
+                <h3>Manage Enrolments</h3>
+
+                <p>
+                    View registered participants, their selected
+                    categories and their enrolment information.
+                </p>
+
+                <a asp-controller="Organiser"
+                   asp-action="ManageEvents"
+                   class="rd-management-link">
+                    Select Event <span aria-hidden="true">&rarr;</span>
+                </a>
+            </article>
+
+            <!-- Results -->
+            <article class="rd-management-card">
+                <div class="rd-management-card-top">
+                    <span class="rd-management-number">04 / RESULTS</span>
+                    <span class="rd-management-icon">R</span>
+                </div>
+
+                <h3>Manage Results</h3>
+
+                <p>
+                    Record finishing times, update race positions
+                    and manage participants' event results.
+                </p>
+
+                <a asp-controller="Organiser"
+                   asp-action="ManageEvents"
+                   class="rd-management-link">
+                    Select Event <span aria-hidden="true">&rarr;</span>
+                </a>
+            </article>
+
+            <!-- Routes -->
+            <article class="rd-management-card">
+                <div class="rd-management-card-top">
+                    <span class="rd-management-number">05 / ROUTES</span>
+                    <span class="rd-management-icon">T</span>
+                </div>
+
+                <h3>Manage Routes</h3>
+
+                <p>
+                    Create and update race routes with descriptions,
+                    locations and external map links.
+                </p>
+
+                <a asp-controller="Organiser"
+                   asp-action="ManageEvents"
+                   class="rd-management-link">
+                    Select Event <span aria-hidden="true">&rarr;</span>
+                </a>
+            </article>
+
+        </div>
+    </section>
+
+    <!-- Closing Dashboard Banner -->
+    <section class="rd-dashboard-bottom-banner">
+        <div>
+            <span>RACEDAY SA</span>
+            <h2>Great events start with great organisation.</h2>
         </div>
 
-        
-<div class="col-md-6 col-lg-4">
-    <div class="card border-0 shadow-sm h-100">
-        <div class="card-body p-4">
-            <h5 class="fw-bold">Manage Categories</h5>
-            <p class="text-muted">
-                Create, update and manage categories for your sporting events.
-            </p>
-            <a asp-controller="Organiser"
-               asp-action="ManageEvents"
-               class="btn btn-primary">
-                Select Event
-            </a>
-        </div>
-    </div>
-</div>
-
-
-       <div class="col-md-6 col-lg-4">
-    <div class="card border-0 shadow-sm h-100">
-        <div class="card-body p-4">
-            <h5 class="fw-bold">Manage Enrolments</h5>
-
-            <p class="text-muted">
-                View participants registered for your sporting events,
-                including their categories and enrolment details.
-            </p>
-
-            <a asp-controller="Organiser"
-               asp-action="ManageEvents"
-               class="btn btn-primary">
-                Select Event
-            </a>
-        </div>
-    </div>
-</div>
-
-        <div class="col-md-6 col-lg-4">
-    <div class="card border-0 shadow-sm h-100">
-        <div class="card-body p-4">
-            <h5 class="fw-bold">Manage Results</h5>
-
-            <p class="text-muted">
-                Record and update participants' finishing times
-                and positions for your sporting events.
-            </p>
-
-            <a asp-controller="Organiser"
-               asp-action="ManageEvents"
-               class="btn btn-primary">
-                Select Event
-            </a>
-        </div>
-    </div>
-</div>
-
-
-
-<div class="col-md-6 col-lg-4 mb-4">
-    <div class="card shadow-sm h-100">
-        <div class="card-body">
-            <h5 class="card-title">Manage Routes</h5>
-
-            <p class="card-text">
-                Create, update and manage event routes.
-                Add route descriptions, locations and external map links.
-            </p>
-
-            <a asp-controller="Organiser"
-               asp-action="ManageEvents"
-               class="btn btn-outline-info">
-                Select Event
-            </a>
-        </div>
-    </div>
-</div>
-
-    </div>
+        <a asp-controller="Organiser"
+           asp-action="ManageEvents"
+           class="rd-dashboard-bottom-link">
+            View Your Events <span aria-hidden="true">&rarr;</span>
+        </a>
+    </section>
 
 </div>
+```

@@ -1,128 +1,220 @@
-﻿
+﻿```cshtml
 @model RaceDay.Web.ViewModels.EventDetailsViewModel
 
 @{
     ViewData["Title"] = "Event Details";
+
     var raceEvent = Model.Event;
     var isParticipant = Context.Session.GetString("Role") == "Participant";
+    var categories = Model.Categories ?? new List<RaceDay.Web.ViewModels.CategoryViewModel>();
 }
 
-<div class="container py-5">
-    <a asp-controller="Events"
-       asp-action="Index"
-       class="btn btn-outline-secondary mb-4">
-        &larr; Back to Events
-    </a>
+<section class="rd-event-details-page">
 
-    <div class="card border-0 shadow-sm overflow-hidden">
-@if (!string.IsNullOrWhiteSpace(raceEvent.BannerImageViewUrl))
-{
-    <img src="@raceEvent.BannerImageViewUrl"
-         alt="Banner for @raceEvent.EventName"
-         class="w-100"
-         style="max-height: 350px; object-fit: cover;" />
-}
+    <div class="rd-details-topbar">
+        <a asp-controller="Events"
+           asp-action="Index"
+           class="rd-back-link">
+            <span aria-hidden="true">&larr;</span>
+            Back to Events
+        </a>
 
-        <div class="card-body p-4 p-md-5">
+        <span class="rd-details-label">RACE EVENT DETAILS</span>
+    </div>
 
-            <span class="badge bg-primary mb-3">
-                @(string.IsNullOrWhiteSpace(raceEvent.EventType)
-                    ? "Race Event"
-                    : raceEvent.EventType)
-            </span>
+    <article class="rd-event-details-card">
 
-            <h1 class="fw-bold mb-3">@raceEvent.EventName</h1>
-
-            <p class="text-muted mb-4">
-                @raceEvent.EventDescription
-            </p>
-
-            <div class="row g-3">
-                <div class="col-12 col-md-6">
-                    <strong>Date and Time</strong>
-                    <p>@raceEvent.EventDate.ToString("dd MMMM yyyy, HH:mm")</p>
-                </div>
-
-                <div class="col-12 col-md-6">
-                    <strong>Location</strong>
-                    <p>@(raceEvent.EventLocation ?? "Not specified")</p>
-                </div>
-
-                <div class="col-12 col-md-6">
-                    <strong>Distance</strong>
-                    <p>@raceEvent.EventDistance km</p>
-                </div>
-
-                <div class="col-12 col-md-6">
-                    <strong>Event Type</strong>
-                    <p>@(raceEvent.EventType ?? "Not specified")</p>
-                </div>
-            </div>
-
-            <hr class="my-4" />
-
-            <h3 class="fw-bold mb-3">Available Categories</h3>
-
-            @if (Model.Categories.Any())
+        <div class="rd-details-banner">
+            @if (!string.IsNullOrWhiteSpace(raceEvent.BannerImageViewUrl))
             {
-                @if (isParticipant)
-                {
-                    <form asp-controller="Enrolment"
-                          asp-action="Create"
-                          method="post">
-
-                        @Html.AntiForgeryToken()
-
-                        <input type="hidden"
-                               name="EventId"
-                               value="@raceEvent.EventId" />
-
-                        <div class="mb-3">
-                            <label for="SelectedCategoryId"
-                                   class="form-label fw-semibold">
-                                Select your race category
-                            </label>
-
-                            <select name="CategoryId"
-                                    id="SelectedCategoryId"
-                                    class="form-select"
-                                    required>
-                                <option value="">Choose a category</option>
-
-                                @foreach (var category in Model.Categories)
-                                {
-                                    <option value="@category.CategoryId">
-                                        @category.CategoryName
-                                    </option>
-                                }
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn btn-primary btn-lg">
-                            Enrol Now
-                        </button>
-                    </form>
-                }
-
-                @foreach (var category in Model.Categories)
-                {
-                    <div class="card border mb-3">
-                        <div class="card-body">
-                            <h5 class="fw-bold">@category.CategoryName</h5>
-                            <p class="text-muted mb-0">
-                                @category.CategoryDescription
-                            </p>
-                        </div>
-                    </div>
-                }
+                <img src="@raceEvent.BannerImageViewUrl"
+                     alt="Banner for @raceEvent.EventName" />
             }
             else
             {
-                <div class="alert alert-info">
-                    No categories have been added to this event yet.
+                <div class="rd-details-banner-placeholder">
+                    <span>RACEDAY SA</span>
+                    <h2>Every race has a story.</h2>
                 </div>
             }
 
+            <div class="rd-details-banner-overlay"></div>
+
+            <div class="rd-details-banner-content">
+                <span class="rd-details-type">
+                    @(string.IsNullOrWhiteSpace(raceEvent.EventType)
+                        ? "Race Event"
+                        : raceEvent.EventType)
+                </span>
+
+                <h1>@raceEvent.EventName</h1>
+
+                <p>
+                    Discover the challenge. Prepare for the race.
+                    Make your next achievement count.
+                </p>
+            </div>
         </div>
-    </div>
-</div>
+
+        <div class="rd-details-content">
+
+            <section class="rd-event-description">
+                <span class="rd-section-eyebrow">ABOUT THE EVENT</span>
+                <h2>Get to know your next challenge.</h2>
+
+                <p>
+                    @(string.IsNullOrWhiteSpace(raceEvent.EventDescription)
+                        ? "More information about this event will be available soon."
+                        : raceEvent.EventDescription)
+                </p>
+            </section>
+
+            <section class="rd-event-info-grid">
+
+                <div class="rd-event-info-item">
+                    <div class="rd-info-icon">01</div>
+                    <div>
+                        <span>DATE AND TIME</span>
+                        <strong>@raceEvent.EventDate.ToString("dd MMMM yyyy")</strong>
+                        <small>@raceEvent.EventDate.ToString("HH:mm")</small>
+                    </div>
+                </div>
+
+                <div class="rd-event-info-item">
+                    <div class="rd-info-icon">02</div>
+                    <div>
+                        <span>LOCATION</span>
+                        <strong>@(raceEvent.EventLocation ?? "Not specified")</strong>
+                        <small>Event venue</small>
+                    </div>
+                </div>
+
+                <div class="rd-event-info-item">
+                    <div class="rd-info-icon">03</div>
+                    <div>
+                        <span>DISTANCE</span>
+                        <strong>@raceEvent.EventDistance km</strong>
+                        <small>Race distance</small>
+                    </div>
+                </div>
+
+                <div class="rd-event-info-item">
+                    <div class="rd-info-icon">04</div>
+                    <div>
+                        <span>EVENT TYPE</span>
+                        <strong>@(raceEvent.EventType ?? "Not specified")</strong>
+                        <small>Race category</small>
+                    </div>
+                </div>
+
+            </section>
+
+            <section class="rd-categories-section">
+
+                <div class="rd-categories-heading">
+                    <div>
+                        <span class="rd-section-eyebrow">FIND YOUR CATEGORY</span>
+                        <h2>Available race categories</h2>
+                        <p>Choose the category that best suits your race experience.</p>
+                    </div>
+
+                    <span class="rd-category-count">
+                        @categories.Count @(categories.Count == 1 ? "CATEGORY" : "CATEGORIES")
+                    </span>
+                </div>
+
+                @if (categories.Any())
+                {
+                    <div class="rd-category-list">
+                        @foreach (var category in categories)
+                        {
+                            <div class="rd-category-card">
+                                <div class="rd-category-marker"></div>
+
+                                <div class="rd-category-information">
+                                    <h3>@category.CategoryName</h3>
+                                    <p>
+                                        @(string.IsNullOrWhiteSpace(category.CategoryDescription)
+                                            ? "No additional category information provided."
+                                            : category.CategoryDescription)
+                                    </p>
+                                </div>
+
+                                <span class="rd-category-arrow" aria-hidden="true">&rarr;</span>
+                            </div>
+                        }
+                    </div>
+
+                    @if (isParticipant)
+                    {
+                        <div class="rd-enrolment-panel">
+                            <div class="rd-enrolment-copy">
+                                <span class="rd-section-eyebrow">READY TO TAKE PART?</span>
+                                <h2>Secure your place in the race.</h2>
+                                <p>Select your preferred category below to enrol in this event.</p>
+                            </div>
+
+                            <form asp-controller="Enrolment"
+                                  asp-action="Create"
+                                  method="post"
+                                  class="rd-enrolment-form">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="EventId"
+                                       value="@raceEvent.EventId" />
+
+                                <div class="rd-enrolment-field">
+                                    <label for="SelectedCategoryId">
+                                        Select your race category
+                                    </label>
+
+                                    <select name="CategoryId"
+                                            id="SelectedCategoryId"
+                                            class="form-select"
+                                            required>
+                                        <option value="">Choose a category</option>
+
+                                        @foreach (var category in categories)
+                                        {
+                                            <option value="@category.CategoryId">
+                                                @category.CategoryName
+                                            </option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="rd-enrol-button">
+                                    Enrol Now
+                                    <span aria-hidden="true">&rarr;</span>
+                                </button>
+                            </form>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="rd-no-categories">
+                        <h3>No categories available yet</h3>
+                        <p>The organiser has not added any race categories to this event.</p>
+                    </div>
+                }
+
+            </section>
+
+            <div class="rd-details-bottom">
+                <a asp-controller="Events"
+                   asp-action="Index"
+                   class="rd-bottom-back-link">
+                    &larr; Explore more events
+                </a>
+
+                <span>RACEDAY SA — DISCOVER. REGISTER. COMPETE.</span>
+            </div>
+
+        </div>
+    </article>
+
+</section>
+```

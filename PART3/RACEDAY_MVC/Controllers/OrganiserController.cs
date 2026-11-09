@@ -23,6 +23,8 @@ namespace RaceDay.Web.Controllers
                 // Get all events from the API.
                 var events = await _apiService.GetEventsAsync();
 
+                
+
                 // Only include events belonging to the logged-in organiser.
                 var organiserId = HttpContext.Session.GetInt32("UserId");
 

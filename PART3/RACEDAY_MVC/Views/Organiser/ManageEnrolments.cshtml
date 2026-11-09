@@ -1,51 +1,114 @@
-﻿@model List<RaceDay.Web.ViewModels.OrganiserEnrolmentViewModel>
+﻿
+@model List<RaceDay.Web.ViewModels.OrganiserEnrolmentViewModel>
 
 @{
     ViewData["Title"] = "Manage Enrolments";
+    var enrolments = Model ?? new List<RaceDay.Web.ViewModels.OrganiserEnrolmentViewModel>();
+    var activeCount = enrolments.Count(e => e.EnrolmentStatus == "Active");
 }
 
-<div class="container mt-4">
+<div class="rd-manage-enrolments-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold">Manage Enrolments</h2>
-            <p class="text-muted mb-0">
-                View participants registered for @ViewBag.EventName.
+    <!-- Page hero -->
+    <section class="rd-enrolments-hero">
+        <div class="rd-enrolments-hero-content">
+            <span class="rd-enrolments-eyebrow">EVENT MANAGEMENT</span>
+            <h1>Manage Enrolments</h1>
+            <p>
+                Keep track of the participants registered for
+                <strong>@ViewBag.EventName</strong>.
             </p>
+
+            <div class="rd-enrolments-event-label">
+                <span>SELECTED EVENT</span>
+                <strong>@ViewBag.EventName</strong>
+            </div>
         </div>
 
         <a asp-controller="Organiser"
            asp-action="ManageEvents"
-           class="btn btn-outline-secondary">
+           class="btn rd-enrolments-back-btn">
             Back to My Events
         </a>
-    </div>
+    </section>
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger rd-enrolments-alert">
             @TempData["ErrorMessage"]
         </div>
     }
 
-    @if (Model == null || !Model.Any())
-    {
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-5">
-                <h5 class="fw-bold">No enrolments yet</h5>
-                <p class="text-muted mb-0">
-                    Participants who register for this event will appear here.
-                </p>
+    <!-- Enrolment overview -->
+    <section class="rd-enrolments-overview">
+        <div class="rd-enrolments-overview-heading">
+            <div>
+                <span class="rd-enrolments-section-eyebrow">PARTICIPANT OVERVIEW</span>
+                <h2>Registered Participants</h2>
+                <p>Review the people taking part in this event.</p>
             </div>
         </div>
-    }
-    else
-    {
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
+
+        <div class="rd-enrolments-stats">
+            <div class="rd-enrolments-stat-card">
+                <div class="rd-enrolments-stat-icon">01</div>
+                <div>
+                    <strong>@enrolments.Count</strong>
+                    <span>Total Enrolments</span>
+                </div>
+            </div>
+
+            <div class="rd-enrolments-stat-card">
+                <div class="rd-enrolments-stat-icon rd-enrolments-stat-icon-active">02</div>
+                <div>
+                    <strong>@activeCount</strong>
+                    <span>Active Participants</span>
+                </div>
+            </div>
+
+            <div class="rd-enrolments-stat-card">
+                <div class="rd-enrolments-stat-icon rd-enrolments-stat-icon-other">03</div>
+                <div>
+                    <strong>@(enrolments.Count - activeCount)</strong>
+                    <span>Other Statuses</span>
+                </div>
+            </div>
+        </div>
+
+        @if (!enrolments.Any())
+        {
+            <div class="rd-enrolments-empty">
+                <div class="rd-enrolments-empty-icon">01</div>
+                <h3>No enrolments yet</h3>
+                <p>
+                    Participants who register for this event will appear here.
+                    Once registrations begin, you'll be able to review their details.
+                </p>
+
+                <a asp-controller="Organiser"
+                   asp-action="ManageEvents"
+                   class="btn rd-enrolments-empty-btn">
+                    Return to My Events
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="rd-enrolments-table-card">
+                <div class="rd-enrolments-table-heading">
+                    <div>
+                        <h3>Enrolment Register</h3>
+                        <p>Participant registration records for this event.</p>
+                    </div>
+
+                    <span class="rd-enrolments-total-badge">
+                        @enrolments.Count @(enrolments.Count == 1 ? "record" : "records")
+                    </span>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
+                    <table class="table rd-enrolments-table align-middle mb-0">
+                        <thead>
                             <tr>
                                 <th>Enrolment ID</th>
                                 <th>Participant</th>
@@ -56,31 +119,55 @@
                         </thead>
 
                         <tbody>
-                            @foreach (var enrolment in Model)
+                            @foreach (var enrolment in enrolments)
                             {
                                 <tr>
-                                    <td>@enrolment.EnrolmentId</td>
                                     <td>
-                                        <div class="fw-semibold">
-                                            @enrolment.ParticipantName
+                                        <span class="rd-enrolment-id">
+                                            #@enrolment.EnrolmentId
+                                        </span>
+                                    </td>
+
+                                    <td>
+                                        <div class="rd-enrolment-participant">
+                                            <div class="rd-enrolment-avatar">
+                                                @(string.IsNullOrWhiteSpace(enrolment.ParticipantName)
+                                                    ? "P"
+                                                    : enrolment.ParticipantName.Substring(0, 1).ToUpper())
+                                            </div>
+
+                                            <div>
+                                                <strong>@enrolment.ParticipantName</strong>
+                                                <small>
+                                                    Participant ID: @enrolment.ParticipantId
+                                                </small>
+                                            </div>
                                         </div>
-                                        <small class="text-muted">
-                                            Participant ID: @enrolment.ParticipantId
-                                        </small>
                                     </td>
-                                    <td>@enrolment.CategoryName</td>
+
                                     <td>
-                                        @enrolment.EnrolmentDate.ToString("dd MMM yyyy")
+                                        <span class="rd-enrolment-category">
+                                            @enrolment.CategoryName
+                                        </span>
                                     </td>
+
+                                    <td>
+                                        <span class="rd-enrolment-date">
+                                            @enrolment.EnrolmentDate.ToString("dd MMM yyyy")
+                                        </span>
+                                    </td>
+
                                     <td>
                                         @if (enrolment.EnrolmentStatus == "Active")
                                         {
-                                            <span class="badge bg-success">Active</span>
+                                            <span class="rd-enrolment-status rd-status-active">
+                                                <span></span> Active
+                                            </span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-secondary">
-                                                @enrolment.EnrolmentStatus
+                                            <span class="rd-enrolment-status rd-status-other">
+                                                <span></span> @enrolment.EnrolmentStatus
                                             </span>
                                         }
                                     </td>
@@ -90,6 +177,7 @@
                     </table>
                 </div>
             </div>
-        </div>
-    }
+        }
+    </section>
+
 </div>

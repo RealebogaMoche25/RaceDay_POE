@@ -1,0 +1,135 @@
+﻿@model RaceDay.Web.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="rd-auth-page">
+    <div class="rd-auth-card">
+
+        <!-- LEFT: SPORTING IMAGE PANEL -->
+        <div class="rd-auth-visual rd-login-visual">
+            <div class="rd-auth-visual-overlay"></div>
+
+            <div class="rd-auth-visual-content">
+                <span class="rd-auth-eyebrow">RACEDAY SA</span>
+
+                <h1>
+                    Every race<br />
+                    starts with<br />
+                    <span>showing up.</span>
+                </h1>
+
+                <p>
+                    Your next challenge is waiting.
+                    Log in and keep moving towards your goals.
+                </p>
+
+                <div class="rd-auth-visual-footer">
+                    <span class="rd-auth-line"></span>
+                    <span>DISCOVER. REGISTER. COMPETE.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: LOGIN FORM -->
+        <div class="rd-auth-form-panel">
+            <div class="rd-auth-form-content">
+
+                <a asp-controller="Home"
+                   asp-action="Index"
+                   class="rd-auth-brand">
+                    RACE<span>DAY</span>
+                </a>
+
+                <div class="rd-auth-heading">
+                    <span class="rd-auth-kicker">WELCOME BACK</span>
+                    <h2>Good to have you back.</h2>
+                    <p>Log in to continue your RaceDay journey.</p>
+                </div>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success" role="alert">
+                        @TempData["SuccessMessage"]
+                    </div>
+                }
+
+                <form asp-controller="Account"
+                      asp-action="Login"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger rd-validation-summary mb-3">
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Email"
+                               class="form-label rd-auth-label">
+                        </label>
+
+                        <input asp-for="Email"
+                               class="form-control rd-auth-input"
+                               placeholder="Enter your email address"
+                               autocomplete="email" />
+
+                        <span asp-validation-for="Email"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <div class="mb-4">
+                        <label asp-for="Password"
+                               class="form-label rd-auth-label">
+                        </label>
+
+                        <input asp-for="Password"
+                               class="form-control rd-auth-input"
+                               placeholder="Enter your password"
+                               autocomplete="current-password" />
+
+                        <span asp-validation-for="Password"
+                              class="text-danger">
+                        </span>
+                    </div>
+
+                    <button type="submit"
+                            class="btn rd-auth-submit w-100">
+                        Log In
+                        <span aria-hidden="true">→</span>
+                    </button>
+
+                    <div class="rd-auth-divider">
+                        <span></span>
+                        <small>NEW TO RACEDAY?</small>
+                        <span></span>
+                    </div>
+
+                    <p class="rd-auth-register">
+                        Don't have an account?
+                        <a asp-controller="Account"
+                           asp-action="Register">
+                            Create one here
+                        </a>
+                    </p>
+
+                </form>
+
+                <div class="rd-auth-bottom">
+                    <a asp-controller="Home"
+                       asp-action="Index">
+                        ← Back to homepage
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

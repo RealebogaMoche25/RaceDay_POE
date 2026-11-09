@@ -3,136 +3,237 @@
 
 @{
     ViewData["Title"] = "Manage Results";
+
+    var enrolments = Model.Enrolments;
+var results = Model.Results;
+
+    var recordedCount = enrolments.Count(e =>
+        results.Any(r => r.EnrolmentId == e.EnrolmentId));
+
+    var pendingCount = enrolments.Count - recordedCount;
 }
 
-<div class="container mt-4">
+<div class="rd-manage-results-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h2 class="fw-bold">Manage Results</h2>
-            <p class="text-muted mb-0">
-                Record and manage race results for @Model.EventName.
+    <!-- Page hero -->
+    <section class="rd-results-hero">
+        <div class="rd-results-hero-content">
+            <span class="rd-results-eyebrow">EVENT MANAGEMENT</span>
+            <h1>Manage Results</h1>
+            <p>
+                Record and manage race performances for
+                <strong>@Model.EventName</strong>.
             </p>
+
+            <div class="rd-results-event-label">
+                <span>SELECTED EVENT</span>
+                <strong>@Model.EventName</strong>
+                <small>Event ID: @Model.EventId</small>
+            </div>
         </div>
 
         <a asp-controller="Organiser"
            asp-action="ManageEvents"
-           class="btn btn-outline-secondary">
+           class="btn rd-results-back-btn">
             Back to My Events
         </a>
-    </div>
+    </section>
 
+    <!-- Feedback messages -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success rd-results-alert">
             @TempData["SuccessMessage"]
         </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger rd-results-alert">
             @TempData["ErrorMessage"]
         </div>
     }
 
-    @if (!Model.Enrolments.Any())
-    {
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center py-5">
-                <h5 class="fw-bold">No participants registered</h5>
-                <p class="text-muted mb-0">
-                    Participants must enrol in this event before results can be entered.
-                </p>
+    <!-- Results overview -->
+    <section class="rd-results-overview">
+
+        <div class="rd-results-section-heading">
+            <div>
+                <span class="rd-results-section-eyebrow">RACE PERFORMANCE</span>
+                <h2>Participant Results</h2>
+                <p>Track completed results and outstanding entries.</p>
             </div>
         </div>
-    }
-    else
-    {
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
 
-                <h5 class="fw-bold mb-3">Participant Results</h5>
+        <div class="rd-results-stats">
+
+            <div class="rd-results-stat-card">
+                <div class="rd-results-stat-icon">01</div>
+                <div>
+                    <strong>@enrolments.Count</strong>
+                    <span>Total Participants</span>
+                </div>
+            </div>
+
+            <div class="rd-results-stat-card">
+                <div class="rd-results-stat-icon rd-results-icon-recorded">02</div>
+                <div>
+                    <strong>@recordedCount</strong>
+                    <span>Results Recorded</span>
+                </div>
+            </div>
+
+            <div class="rd-results-stat-card">
+                <div class="rd-results-stat-icon rd-results-icon-pending">03</div>
+                <div>
+                    <strong>@pendingCount</strong>
+                    <span>Results Pending</span>
+                </div>
+            </div>
+
+        </div>
+
+        @if (!enrolments.Any())
+        {
+            <div class="rd-results-empty">
+                <div class="rd-results-empty-icon">01</div>
+                <h3>No participants registered</h3>
+                <p>
+                    Participants must enrol in this event before their
+                    race results can be entered.
+                </p>
+
+                <a asp-controller="Organiser"
+                   asp-action="ManageEvents"
+                   class="btn rd-results-empty-btn">
+                    Return to My Events
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="rd-results-table-card">
+
+                <div class="rd-results-table-heading">
+                    <div>
+                        <h3>Race Results Register</h3>
+                        <p>Manage the finishing performance of each participant.</p>
+                    </div>
+
+                    <span class="rd-results-total-badge">
+                        @enrolments.Count @(enrolments.Count == 1 ? "participant" : "participants")
+                    </span>
+                </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
+                    <table class="table rd-results-table align-middle mb-0">
+                        <thead>
                             <tr>
                                 <th>Participant</th>
                                 <th>Category</th>
                                 <th>Finish Time</th>
                                 <th>Position</th>
                                 <th>Result Status</th>
-                                <th>Action</th>
+                                <th class="text-end">Action</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            @foreach (var enrolment in Model.Enrolments)
+                            @foreach (var enrolment in enrolments)
                             {
-                                var result = Model.Results.FirstOrDefault(
+                                var result = results.FirstOrDefault(
                                     r => r.EnrolmentId == enrolment.EnrolmentId);
 
                                 <tr>
                                     <td>
-                                        <div class="fw-semibold">
-                                            @enrolment.ParticipantName
+                                        <div class="rd-results-participant">
+                                            <div class="rd-results-avatar">
+                                                @(string.IsNullOrWhiteSpace(enrolment.ParticipantName)
+                                                    ? "P"
+                                                    : enrolment.ParticipantName.Substring(0, 1).ToUpper())
+                                            </div>
+
+                                            <div>
+                                                <strong>@enrolment.ParticipantName</strong>
+                                                <small>
+                                                    Participant ID: @enrolment.ParticipantId
+                                                </small>
+                                            </div>
                                         </div>
-                                        <small class="text-muted">
-                                            Participant ID: @enrolment.ParticipantId
-                                        </small>
-                                    </td>
-
-                                    <td>@enrolment.CategoryName</td>
-
-                                    <td>
-                                        @(result != null
-                                            ? result.FinishTime.ToString(@"hh\:mm\:ss")
-                                            : "Not recorded")
                                     </td>
 
                                     <td>
-                                        @(result != null
-                                            ? result.FinishingPosition.ToString()
-                                            : "—")
+                                        <span class="rd-results-category">
+                                            @enrolment.CategoryName
+                                        </span>
                                     </td>
 
                                     <td>
                                         @if (result != null)
                                         {
-                                            <span class="badge bg-success">
-                                                Recorded
+                                            <span class="rd-results-time">
+                                                @result.FinishTime.ToString(@"hh\:mm\:ss")
                                             </span>
                                         }
                                         else
                                         {
-                                            <span class="badge bg-warning text-dark">
-                                                Pending
+                                            <span class="rd-results-not-recorded">
+                                                Not recorded
                                             </span>
                                         }
                                     </td>
 
                                     <td>
-                                        @if (result == null)
+                                        @if (result != null)
                                         {
-                                            <a asp-controller="Organiser"
-                                               asp-action="EnterResult"
-                                               asp-route-eventId="@Model.EventId"
-                                               asp-route-enrolmentId="@enrolment.EnrolmentId"
-                                               class="btn btn-primary btn-sm">
-                                                Enter Result
-                                            </a>
+                                            <span class="rd-results-position">
+                                                #@result.FinishingPosition
+                                            </span>
                                         }
                                         else
                                         {
-                                            <a asp-controller="Organiser"
-                                               asp-action="EditResult"
-                                               asp-route-eventId="@Model.EventId"
-                                               asp-route-resultId="@result.ResultId"
-                                               class="btn btn-outline-primary btn-sm">
-                                                Edit Result
-                                            </a>
+                                            <span class="rd-results-not-recorded">—</span>
                                         }
+                                    </td>
+
+                                    <td>
+                                        @if (result != null)
+                                        {
+                                            <span class="rd-results-status rd-results-status-recorded">
+                                                <span></span> Recorded
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="rd-results-status rd-results-status-pending">
+                                                <span></span> Pending
+                                            </span>
+                                        }
+                                    </td>
+
+                                    <td>
+                                        <div class="rd-results-action">
+                                            @if (result == null)
+                                            {
+                                                <a asp-controller="Organiser"
+                                                   asp-action="EnterResult"
+                                                   asp-route-eventId="@Model.EventId"
+                                                   asp-route-enrolmentId="@enrolment.EnrolmentId"
+                                                   class="btn rd-results-enter-btn btn-sm">
+                                                    Enter Result
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="Organiser"
+                                                   asp-action="EditResult"
+                                                   asp-route-eventId="@Model.EventId"
+                                                   asp-route-resultId="@result.ResultId"
+                                                   class="btn rd-results-edit-btn btn-sm">
+                                                    Edit Result
+                                                </a>
+                                            }
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -141,7 +242,8 @@
                 </div>
 
             </div>
-        </div>
-    }
+        }
+
+    </section>
 
 </div>

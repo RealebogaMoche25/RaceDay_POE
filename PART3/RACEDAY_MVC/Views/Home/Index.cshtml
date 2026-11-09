@@ -1,9 +1,188 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Discover Your Next Challenge";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- HERO SECTION -->
+<section class="rd-hero">
+    <div class="rd-hero-image"></div>
 
+    <div class="rd-hero-overlay"></div>
+
+    <div class="rd-hero-content">
+        <span class="rd-hero-eyebrow">
+            RACEDAY SA | DISCOVER. REGISTER. COMPETE.
+        </span>
+
+        <h1>
+            Every race has a story.<br />
+            <span>What's yours?</span>
+        </h1>
+
+        <p>
+            Discover sporting events, challenge yourself, connect with
+            athletes and make every finish line count.
+        </p>
+
+        <div class="rd-hero-actions">
+            <a asp-controller="Account"
+               asp-action="Register"
+               class="btn rd-btn-primary">
+                Join the Action
+                <span aria-hidden="true">→</span>
+            </a>
+
+            <a asp-controller="Events"
+               asp-action="Index"
+               class="btn rd-btn-outline">
+                Explore Events
+            </a>
+        </div>
+
+        <div class="rd-hero-caption">
+            FIND YOUR NEXT CHALLENGE. MAKE IT COUNT.
+        </div>
+    </div>
+
+    <div class="rd-hero-number">
+        <span>01</span>
+        <span class="rd-hero-number-line"></span>
+        <span>RACE YOUR WAY</span>
+    </div>
+</section>
+
+<!-- INTRODUCTION -->
+<section class="rd-intro-section">
+    <div class="rd-section-heading">
+        <span class="rd-section-label">MORE THAN JUST A FINISH LINE</span>
+
+        <h2>
+            Your passion.<br />
+            <span>Your next big achievement.</span>
+        </h2>
+
+        <p>
+            RaceDay brings participants and event organisers together
+            through one convenient sporting events platform.
+            Whether you're competing or creating the experience,
+            your next move starts here.
+        </p>
+    </div>
+</section>
+
+<!-- PLATFORM FEATURES -->
+<section class="rd-feature-section">
+    <div class="rd-section-top">
+        <div>
+            <span class="rd-section-label">THE RACEDAY EXPERIENCE</span>
+            <h2>Everything starts with a challenge.</h2>
+        </div>
+
+        <a asp-controller="Events"
+           asp-action="Index"
+           class="rd-text-link">
+            Discover events →
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- FEATURE 1 -->
+        <div class="col-md-4">
+            <article class="rd-feature-card">
+                <div class="rd-feature-image rd-feature-image-one"></div>
+
+                <div class="rd-feature-card-content">
+                    <span class="rd-feature-number">01 / PARTICIPANTS</span>
+
+                    <h3>Find your next race.</h3>
+
+                    <p>
+                        Explore sporting events, discover new challenges
+                        and take the next step towards your goals.
+                    </p>
+
+                    <a asp-controller="Events"
+                       asp-action="Index"
+                       class="rd-card-link">
+                        Explore events →
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <!-- FEATURE 2 -->
+        <div class="col-md-4">
+            <article class="rd-feature-card">
+                <div class="rd-feature-image rd-feature-image-two"></div>
+
+                <div class="rd-feature-card-content">
+                    <span class="rd-feature-number">02 / ORGANISERS</span>
+
+                    <h3>Bring your event to life.</h3>
+
+                    <p>
+                        Create and manage sporting events, coordinate
+                        participants and keep your event organised.
+                    </p>
+
+                    <a asp-controller="Account"
+                       asp-action="Login"
+                       class="rd-card-link">
+                        Organiser portal →
+                    </a>
+                </div>
+            </article>
+        </div>
+
+        <!-- FEATURE 3 -->
+        <div class="col-md-4">
+            <article class="rd-feature-card">
+                <div class="rd-feature-image rd-feature-image-three"></div>
+
+                <div class="rd-feature-card-content">
+                    <span class="rd-feature-number">03 / RESULTS</span>
+
+                    <h3>Celebrate every finish.</h3>
+
+                    <p>
+                        Keep track of your event participation and
+                        results as you work towards your next milestone.
+                    </p>
+
+                    <a asp-controller="Account"
+                       asp-action="Register"
+                       class="rd-card-link">
+                        Get started →
+                    </a>
+                </div>
+            </article>
+        </div>
+
+    </div>
+</section>
+
+<!-- CALL TO ACTION -->
+<section class="rd-cta-section">
+    <div class="rd-cta-content">
+        <span class="rd-section-label rd-cta-label">
+            YOUR NEXT CHAPTER STARTS HERE
+        </span>
+
+        <h2>
+            Ready to make<br />
+            <span>your move?</span>
+        </h2>
+
+        <p>
+            Whether you're chasing a personal best or organising
+            the next big event, there's a place for you at RaceDay.
+        </p>
+
+        <a asp-controller="Account"
+           asp-action="Register"
+           class="btn rd-btn-primary">
+            Get Started
+            <span aria-hidden="true">→</span>
+        </a>
+    </div>
+</section>

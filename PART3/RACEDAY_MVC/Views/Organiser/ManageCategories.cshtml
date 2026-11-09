@@ -3,114 +3,166 @@
 
 @{
     ViewData["Title"] = "Manage Categories";
+    var categories = Model.Categories ?? new List<RaceDay.Web.ViewModels.CategoryViewModel>();
 }
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h2>Manage Categories</h2>
-        <p class="text-muted">
-            Manage categories for: <strong>@Model.EventName</strong>
-        </p>
-    </div>
+<div class="rd-manage-categories-page">
 
-    <div class="d-flex gap-2">
-        <a asp-controller="Organiser"
-           asp-action="CreateCategory"
-           asp-route-eventId="@Model.EventId"
-           class="btn btn-primary">
-            Create Category
-        </a>
+    <!-- Page heading -->
+    <section class="rd-category-hero">
+        <div class="rd-category-hero-content">
+            <span class="rd-category-eyebrow">EVENT MANAGEMENT</span>
+            <h1>Manage Categories</h1>
+            <p>
+                Organise the different race categories available for
+                <strong>@Model.EventName</strong>.
+            </p>
 
-        <a asp-controller="Organiser"
-           asp-action="ManageEvents"
-           class="btn btn-outline-secondary">
-            Back to My Events
-        </a>
-    </div>
-</div>
+            <div class="rd-category-event-label">
+                <span>MANAGING EVENT</span>
+                <strong>@Model.EventName</strong>
+                <small>Event ID: @Model.EventId</small>
+            </div>
+        </div>
 
+        <div class="rd-category-hero-actions">
+            <a asp-controller="Organiser"
+               asp-action="CreateCategory"
+               asp-route-eventId="@Model.EventId"
+               class="btn rd-btn-orange">
+                <span>+</span> Create Category
+            </a>
+
+            <a asp-controller="Organiser"
+               asp-action="ManageEvents"
+               class="btn rd-btn-light-outline">
+                Back to My Events
+            </a>
+        </div>
+    </section>
+
+    <!-- Feedback messages -->
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success">
+        <div class="alert alert-success rd-alert">
             @TempData["SuccessMessage"]
         </div>
     }
 
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">
+        <div class="alert alert-danger rd-alert">
             @TempData["ErrorMessage"]
         </div>
     }
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h5 class="card-title">Event Categories</h5>
+    <!-- Category management -->
+    <section class="rd-category-content">
 
-            @if (Model.Categories != null && Model.Categories.Any())
-            {
+        <div class="rd-category-section-heading">
+            <div>
+                <span class="rd-section-eyebrow">RACE CONFIGURATION</span>
+                <h2>Event Categories</h2>
+                <p>View, update and manage the categories for this event.</p>
+            </div>
+
+            <div class="rd-category-count">
+                <strong>@categories.Count</strong>
+                <span>@(categories.Count == 1 ? "Category" : "Categories")</span>
+            </div>
+        </div>
+
+        @if (categories.Any())
+        {
+            <div class="rd-category-table-card">
                 <div class="table-responsive">
-                    <table class="table table-striped align-middle">
+                    <table class="table rd-category-table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th>Category Name</th>
+                                <th>Category</th>
                                 <th>Description</th>
                                 <th>Category ID</th>
-                                <th>Actions</th>
+                                <th class="text-end">Actions</th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            @foreach (var category in Model.Categories)
+                            @foreach (var category in categories)
                             {
                                 <tr>
-                                    <td>@category.CategoryName</td>
-                                    <td>@category.CategoryDescription</td>
-                                    <td>@category.CategoryId</td>
-                                    
-<td>
-    <div class="d-flex gap-2">
+                                    <td>
+                                        <div class="rd-category-name">
+                                            <span class="rd-category-icon">R</span>
+                                            <strong>@category.CategoryName</strong>
+                                        </div>
+                                    </td>
 
-        <a asp-controller="Organiser"
-           asp-action="EditCategory"
-           asp-route-eventId="@Model.EventId"
-           asp-route-categoryId="@category.CategoryId"
-           class="btn btn-outline-primary btn-sm">
-            Edit
-        </a>
+                                    <td>
+                                        <span class="rd-category-description">
+                                            @(string.IsNullOrWhiteSpace(category.CategoryDescription)
+                                                ? "No description provided"
+                                                : category.CategoryDescription)
+                                        </span>
+                                    </td>
 
-        <form asp-controller="Organiser"
-              asp-action="DeleteCategory"
-              asp-route-eventId="@Model.EventId"
-              asp-route-categoryId="@category.CategoryId"
-              method="post"
-              onsubmit="return confirm('Are you sure you want to delete this category?');">
+                                    <td>
+                                        <span class="rd-category-id">
+                                            #@category.CategoryId
+                                        </span>
+                                    </td>
 
-            @Html.AntiForgeryToken()
+                                    <td>
+                                        <div class="rd-category-actions">
+                                            <a asp-controller="Organiser"
+                                               asp-action="EditCategory"
+                                               asp-route-eventId="@Model.EventId"
+                                               asp-route-categoryId="@category.CategoryId"
+                                               class="btn rd-btn-edit btn-sm">
+                                                Edit
+                                            </a>
 
-            <button type="submit"
-                    class="btn btn-outline-danger btn-sm">
-                Delete
-            </button>
+                                            <form asp-controller="Organiser"
+                                                  asp-action="DeleteCategory"
+                                                  asp-route-eventId="@Model.EventId"
+                                                  asp-route-categoryId="@category.CategoryId"
+                                                  method="post"
+                                                  onsubmit="return confirm('Are you sure you want to delete this category?');">
 
-        </form>
+                                                @Html.AntiForgeryToken()
 
-    </div>
-</td>
-
+                                                <button type="submit"
+                                                        class="btn rd-btn-delete btn-sm">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
                             }
                         </tbody>
                     </table>
                 </div>
-            }
-            else
-            {
-                <p class="text-muted mb-0">
-                    No categories have been added to this event yet.
+            </div>
+        }
+        else
+        {
+            <div class="rd-category-empty">
+                <div class="rd-category-empty-icon">+</div>
+                <h3>No categories yet</h3>
+                <p>
+                    This event doesn't have any categories.
+                    Create your first category to start organising your race.
                 </p>
-            }
-        </div>
-    </div>
+
+                <a asp-controller="Organiser"
+                   asp-action="CreateCategory"
+                   asp-route-eventId="@Model.EventId"
+                   class="btn rd-btn-orange">
+                    Create Your First Category
+                </a>
+            </div>
+        }
+
+    </section>
 
 </div>

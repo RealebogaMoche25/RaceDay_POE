@@ -1,17 +1,18 @@
-﻿
-@model List<RaceDay.Web.ViewModels.EventViewModel>
+﻿@model List<RaceDay.Web.ViewModels.EventViewModel>
 
 @{
     ViewData["Title"] = "Browse Events";
 
-    var locations = Model
+    var events = Model ?? new List<RaceDay.Web.ViewModels.EventViewModel>();
+
+    var locations = events
         .Where(e => !string.IsNullOrWhiteSpace(e.EventLocation))
         .Select(e => e.EventLocation!)
         .Distinct()
         .OrderBy(location => location)
         .ToList();
 
-    var eventTypes = Model
+    var eventTypes = events
         .Where(e => !string.IsNullOrWhiteSpace(e.EventType))
         .Select(e => e.EventType!)
         .Distinct()
@@ -19,49 +20,97 @@
         .ToList();
 }
 
-<div class="container py-5">
-    <div class="mb-4">
-        <h1 class="fw-bold">RaceDay Events</h1>
-        <p class="text-muted">
-            Discover races and community events. Find an event that suits you.
-        </p>
-    </div>
+<div class="rd-events-page">
 
-    @if (ViewBag.ErrorMessage != null)
-    {
-        <div class="alert alert-warning" role="alert">
-            @ViewBag.ErrorMessage
-        </div>
-    }
-    else if (Model == null || !Model.Any())
-    {
-        <div class="alert alert-info" role="alert">
-            No events are available at the moment.
-        </div>
-    }
-    else
-    {
-        <div class="card border-0 shadow-sm mb-4">
-            <div class="card-body">
-                <h2 class="h5 fw-bold mb-3">Find an Event</h2>
+    <!-- PAGE HERO -->
+    <section class="rd-events-hero">
+        <div class="rd-events-hero-overlay"></div>
 
-                <div class="row g-3">
-                    <div class="col-12 col-md-4">
-                        <label for="eventSearch" class="form-label">
-                            Search by event name
-                        </label>
-                        <input type="search"
-                               id="eventSearch"
-                               class="form-control"
-                               placeholder="e.g. RaceDay Demo Run" />
+        <div class="rd-events-hero-content">
+            <span class="rd-events-eyebrow">
+                THE RACEDAY EXPERIENCE
+            </span>
+
+            <h1>
+                Find your next<br />
+                <span>challenge.</span>
+            </h1>
+
+            <p>
+                From your first starting line to your next big finish,
+                discover events that inspire you to go further.
+            </p>
+
+            <a href="#eventDiscovery" class="rd-events-hero-link">
+                Explore Events
+                <span aria-hidden="true">↓</span>
+            </a>
+        </div>
+
+        <div class="rd-events-hero-caption">
+            DISCOVER. REGISTER. COMPETE.
+        </div>
+    </section>
+
+    <div class="container rd-events-container" id="eventDiscovery">
+
+        <!-- PAGE INTRODUCTION -->
+        <div class="rd-events-intro">
+            <div>
+                <span class="rd-section-kicker">WHAT'S HAPPENING?</span>
+                <h2>Explore RaceDay Events</h2>
+                <p>
+                    Find an event, choose your challenge and get ready
+                    to make your mark.
+                </p>
+            </div>
+
+            <div class="rd-events-intro-mark">
+                <span>RD</span>
+                <small>RACE YOUR WAY</small>
+            </div>
+        </div>
+
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="alert alert-warning" role="alert">
+                @ViewBag.ErrorMessage
+            </div>
+        }
+        else
+        {
+            <!-- EVENT SEARCH AND FILTERS -->
+            <section class="rd-event-filter-panel">
+                <div class="rd-filter-heading">
+                    <div>
+                        <span class="rd-section-kicker">FIND YOUR FIT</span>
+                        <h3>Find an Event</h3>
                     </div>
 
-                    <div class="col-12 col-md-4">
-                        <label for="locationFilter" class="form-label">
-                            Filter by location
+                    <span class="rd-filter-icon" aria-hidden="true">⌕</span>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-12 col-lg-4">
+                        <label for="eventSearch" class="rd-filter-label">
+                            Search events
                         </label>
-                        <select id="locationFilter" class="form-select">
+
+                        <input type="search"
+                               id="eventSearch"
+                               class="form-control rd-filter-input"
+                               placeholder="Search by event name..." />
+                    </div>
+
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="locationFilter" class="rd-filter-label">
+                            Location
+                        </label>
+
+                        <select id="locationFilter"
+                                class="form-select rd-filter-input">
                             <option value="">All locations</option>
+
                             @foreach (var location in locations)
                             {
                                 <option value="@location">@location</option>
@@ -69,12 +118,15 @@
                         </select>
                     </div>
 
-                    <div class="col-12 col-md-4">
-                        <label for="typeFilter" class="form-label">
-                            Filter by event type
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <label for="typeFilter" class="rd-filter-label">
+                            Event category
                         </label>
-                        <select id="typeFilter" class="form-select">
+
+                        <select id="typeFilter"
+                                class="form-select rd-filter-input">
                             <option value="">All event types</option>
+
                             @foreach (var type in eventTypes)
                             {
                                 <option value="@type">@type</option>
@@ -83,100 +135,163 @@
                     </div>
                 </div>
 
-                <div class="d-flex flex-wrap align-items-center gap-3 mt-3">
+                <div class="rd-filter-footer">
                     <button type="button"
                             id="clearFilters"
-                            class="btn btn-outline-secondary">
+                            class="rd-clear-filter">
+                        <span aria-hidden="true">↻</span>
                         Clear Filters
                     </button>
 
                     <span id="eventCount"
-                          class="text-muted small"
-                          aria-live="polite"></span>
+                          class="rd-event-count"
+                          aria-live="polite">
+                    </span>
+                </div>
+            </section>
+
+            <!-- EVENT LISTINGS -->
+            <div class="rd-listing-heading">
+                <div>
+                    <span class="rd-section-kicker">YOUR NEXT STARTING LINE</span>
+                    <h3>Upcoming Opportunities</h3>
                 </div>
             </div>
-        </div>
 
-        <div class="row g-4" id="eventCards">
-            @foreach (var raceEvent in Model)
+            @if (!events.Any())
             {
-                <div class="col-12 col-md-6 col-lg-4 event-card"
-                     data-name="@raceEvent.EventName"
-                     data-location="@raceEvent.EventLocation"
-                     data-type="@raceEvent.EventType">
-                    <div class="card h-100 shadow-sm border-0">
-                        @if (!string.IsNullOrWhiteSpace(raceEvent.BannerImageViewUrl))
-{
-    <img src="@raceEvent.BannerImageViewUrl"
-         class="card-img-top"
-         alt="Banner for @raceEvent.EventName"
-         style="height: 200px; object-fit: cover;" />
-}
-else
-{
-    <div class="bg-primary text-white d-flex
-                align-items-center justify-content-center"
-         style="height: 200px;">
-        <span class="fw-bold fs-4">RaceDay</span>
-    </div>
-}
-
-                        <div class="card-body d-flex flex-column">
-                            <div class="mb-2">
-                                <span class="badge bg-primary">
-                                    @(string.IsNullOrWhiteSpace(raceEvent.EventType)
-                                        ? "Race Event"
-                                        : raceEvent.EventType)
-                                </span>
-                            </div>
-
-                            <h2 class="h5 fw-bold">@raceEvent.EventName</h2>
-
-                            <p class="text-muted small">
-                                @raceEvent.EventDescription
-                            </p>
-
-                            <p class="mb-1">
-                                <strong>Date:</strong>
-                                @raceEvent.EventDate.ToString("dd MMM yyyy, HH:mm")
-                            </p>
-
-                            <p class="mb-1">
-                                <strong>Location:</strong>
-                                @(raceEvent.EventLocation ?? "Not specified")
-                            </p>
-
-                            <p class="mb-3">
-                                <strong>Distance:</strong>
-                                @raceEvent.EventDistance km
-                            </p>
-
-                            <div class="mt-auto">
-                                <a asp-controller="Events"
-                                   asp-action="Details"
-                                   asp-route-id="@raceEvent.EventId"
-                                   class="btn btn-outline-primary w-100">
-                                    View Details
-                                </a>
-                            </div>
-                        </div>
-                    </div>
+                <div class="rd-events-empty">
+                    <div class="rd-empty-icon">RD</div>
+                    <h3>No events available just yet.</h3>
+                    <p>
+                        Check back soon. New challenges may be added
+                        to RaceDay.
+                    </p>
                 </div>
             }
-        </div>
+            else
+            {
+                <div class="row g-4" id="eventCards">
 
-        <div id="noMatchingEvents"
-             class="alert alert-info mt-4"
-             role="status"
-             style="display: none;">
-            No events match your search. Try changing or clearing your filters.
-        </div>
-    }
+                    @foreach (var raceEvent in events)
+                    {
+                        <div class="col-12 col-md-6 col-xl-4 event-card"
+                             data-name="@raceEvent.EventName"
+                             data-location="@raceEvent.EventLocation"
+                             data-type="@raceEvent.EventType">
+
+                            <article class="rd-event-card">
+
+                                <!-- EVENT BANNER -->
+                                <div class="rd-event-image">
+                                    @if (!string.IsNullOrWhiteSpace(raceEvent.BannerImageViewUrl))
+                                    {
+                                        <img src="@raceEvent.BannerImageViewUrl"
+                                             alt="Banner for @raceEvent.EventName"
+                                             loading="lazy" />
+                                    }
+                                    else
+                                    {
+                                        <div class="rd-event-image-placeholder">
+                                            <span>RACE<span>DAY</span></span>
+                                            <small>YOUR NEXT CHALLENGE</small>
+                                        </div>
+                                    }
+
+                                    <span class="rd-event-category">
+                                        @(string.IsNullOrWhiteSpace(raceEvent.EventType)
+                                            ? "Race Event"
+                                            : raceEvent.EventType)
+                                    </span>
+                                </div>
+
+                                <!-- EVENT INFORMATION -->
+                                <div class="rd-event-card-body">
+
+                                    <h4>@raceEvent.EventName</h4>
+
+                                    <p class="rd-event-description">
+                                        @raceEvent.EventDescription
+                                    </p>
+
+                                    <div class="rd-event-details">
+
+                                        <div class="rd-event-detail">
+                                            <span class="rd-detail-icon"
+                                                  aria-hidden="true">◷</span>
+                                            <div>
+                                                <small>EVENT DATE</small>
+                                                <strong>
+                                                    @raceEvent.EventDate.ToString("dd MMM yyyy, HH:mm")
+                                                </strong>
+                                            </div>
+                                        </div>
+
+                                        <div class="rd-event-detail">
+                                            <span class="rd-detail-icon"
+                                                  aria-hidden="true">⌖</span>
+                                            <div>
+                                                <small>LOCATION</small>
+                                                <strong>
+                                                    @(raceEvent.EventLocation ?? "Not specified")
+                                                </strong>
+                                            </div>
+                                        </div>
+
+                                        <div class="rd-event-detail">
+                                            <span class="rd-detail-icon"
+                                                  aria-hidden="true">↗</span>
+                                            <div>
+                                                <small>DISTANCE</small>
+                                                <strong>
+                                                    @raceEvent.EventDistance km
+                                                </strong>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+                                    <a asp-controller="Events"
+                                       asp-action="Details"
+                                       asp-route-id="@raceEvent.EventId"
+                                       class="rd-event-view-btn">
+                                        View Event Details
+                                        <span aria-hidden="true">→</span>
+                                    </a>
+
+                                </div>
+                            </article>
+
+                        </div>
+                    }
+
+                </div>
+
+                <!-- NO MATCHING EVENTS -->
+                <div id="noMatchingEvents"
+                     class="rd-events-empty"
+                     role="status"
+                     style="display: none;">
+
+                    <div class="rd-empty-icon">RD</div>
+
+                    <h3>No matching events found.</h3>
+
+                    <p>
+                        Try another search or adjust your filters
+                        to discover more events.
+                    </p>
+                </div>
+            }
+        }
+
+    </div>
 </div>
 
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+
             const searchInput = document.getElementById("eventSearch");
             const locationFilter = document.getElementById("locationFilter");
             const typeFilter = document.getElementById("typeFilter");
@@ -185,7 +300,13 @@ else
             const eventCount = document.getElementById("eventCount");
             const noMatchingEvents = document.getElementById("noMatchingEvents");
 
+            if (!searchInput || !locationFilter || !typeFilter ||
+                !clearButton || !eventCount || !noMatchingEvents) {
+                return;
+            }
+
             function filterEvents() {
+
                 const searchTerm = searchInput.value.trim().toLowerCase();
                 const selectedLocation = locationFilter.value.toLowerCase();
                 const selectedType = typeFilter.value.toLowerCase();
@@ -193,15 +314,20 @@ else
                 let visibleCount = 0;
 
                 eventCards.forEach(function (card) {
+
                     const name = (card.dataset.name || "").toLowerCase();
                     const location = (card.dataset.location || "").toLowerCase();
                     const type = (card.dataset.type || "").toLowerCase();
 
                     const matchesName = name.includes(searchTerm);
+
                     const matchesLocation =
-                        selectedLocation === "" || location === selectedLocation;
+                        selectedLocation === "" ||
+                        location === selectedLocation;
+
                     const matchesType =
-                        selectedType === "" || type === selectedType;
+                        selectedType === "" ||
+                        type === selectedType;
 
                     const matches =
                         matchesName && matchesLocation && matchesType;
@@ -230,6 +356,7 @@ else
                 searchInput.value = "";
                 locationFilter.value = "";
                 typeFilter.value = "";
+
                 filterEvents();
                 searchInput.focus();
             });
