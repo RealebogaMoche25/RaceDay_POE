@@ -11,6 +11,8 @@ using RACEDAY_API.Controllers;
 using RACEDAY_API.Data;
 using RACEDAY_API.Models;
 using System.Security.Claims;
+using RACEDAY_API.Services;
+using Microsoft.Extensions.Configuration;
 
 namespace RACEDAY_API.API.Test
 {
@@ -217,7 +219,19 @@ namespace RACEDAY_API.API.Test
             context.Users.Add(organiser);
             context.SaveChanges();
 
-            var controller = new EventController(context);
+            var configuration = new ConfigurationBuilder()
+    .AddInMemoryCollection(new Dictionary<string, string?>
+    {
+        ["AzureBlobStorage:ConnectionString"] =
+            "UseDevelopmentStorage=true"
+    })
+    .Build();
+
+            var blobStorageService = new AzureBlobStorageService(configuration);
+
+            var controller = new EventController(
+                context,
+                blobStorageService);
 
             var claims = new List<Claim>
     {
