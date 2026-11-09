@@ -122,7 +122,8 @@ namespace RaceDay.Web.Controllers
                     EventLocation = raceEvent.EventLocation,
                     EventDistance = raceEvent.EventDistance,
                     EventType = raceEvent.EventType,
-                    BannerImageUrl = raceEvent.BannerImageUrl
+                    BannerImageUrl = raceEvent.BannerImageUrl,
+                    BannerImageViewUrl = raceEvent.BannerImageViewUrl
                 };
 
                 return View(model);
@@ -133,6 +134,7 @@ namespace RaceDay.Web.Controllers
                 return RedirectToAction("ManageEvents");
             }
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -147,6 +149,26 @@ namespace RaceDay.Web.Controllers
 
             try
             {
+                // Retrieve the existing event before updating it.
+                var existingEvent = await _apiService.GetEventByIdAsync(id);
+
+                if (existingEvent == null)
+                {
+                    return NotFound();
+                }
+
+                // Verify that the event belongs to the logged-in organiser.
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (existingEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                // Preserve the existing Azure banner image.
+                model.BannerImageUrl = existingEvent.BannerImageUrl;
+
+                // Update the event details without removing its banner.
                 await _apiService.UpdateEventAsync(id, model);
 
                 TempData["SuccessMessage"] = "Event updated successfully.";
@@ -156,9 +178,62 @@ namespace RaceDay.Web.Controllers
             catch (HttpRequestException ex)
             {
                 ModelState.AddModelError(string.Empty, ex.Message);
+
                 return View(model);
             }
         }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadEventBanner(int id, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Please select an image to upload.";
+                return RedirectToAction("EditEvent", new { id });
+            }
+
+            if (file.Length > 5 * 1024 * 1024)
+            {
+                TempData["ErrorMessage"] = "The image must not exceed 5 MB.";
+                return RedirectToAction("EditEvent", new { id });
+            }
+
+            try
+            {
+                var raceEvent = await _apiService.GetEventByIdAsync(id);
+
+                if (raceEvent == null)
+                {
+                    return NotFound();
+                }
+
+                var organiserId = HttpContext.Session.GetInt32("UserId");
+
+                if (raceEvent.OrganiserId != organiserId)
+                {
+                    return Forbid();
+                }
+
+                await _apiService.UploadEventBannerAsync(id, file);
+
+                TempData["SuccessMessage"] =
+                    "Event banner uploaded successfully.";
+
+                return RedirectToAction("EditEvent", new { id });
+            }
+            catch (HttpRequestException ex)
+            {
+                TempData["ErrorMessage"] =
+                    $"Unable to upload event banner: {ex.Message}";
+
+                return RedirectToAction("EditEvent", new { id });
+            }
+        }
+
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]

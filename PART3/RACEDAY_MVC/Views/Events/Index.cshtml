@@ -105,27 +105,21 @@
                      data-location="@raceEvent.EventLocation"
                      data-type="@raceEvent.EventType">
                     <div class="card h-100 shadow-sm border-0">
-                        @if (!string.IsNullOrWhiteSpace(raceEvent.BannerImageUrl)
-                             && Uri.IsWellFormedUriString(
-                                 raceEvent.BannerImageUrl, UriKind.Absolute)
-                             && (raceEvent.BannerImageUrl.StartsWith(
-                                     "https://", StringComparison.OrdinalIgnoreCase)
-                                 || raceEvent.BannerImageUrl.StartsWith(
-                                     "http://", StringComparison.OrdinalIgnoreCase)))
-                        {
-                            <img src="@raceEvent.BannerImageUrl"
-                                 class="card-img-top"
-                                 alt="Banner for @raceEvent.EventName"
-                                 style="height: 200px; object-fit: cover;" />
-                        }
-                        else
-                        {
-                            <div class="bg-primary text-white d-flex
-                                        align-items-center justify-content-center"
-                                 style="height: 200px;">
-                                <span class="fw-bold fs-4">RaceDay</span>
-                            </div>
-                        }
+                        @if (!string.IsNullOrWhiteSpace(raceEvent.BannerImageViewUrl))
+{
+    <img src="@raceEvent.BannerImageViewUrl"
+         class="card-img-top"
+         alt="Banner for @raceEvent.EventName"
+         style="height: 200px; object-fit: cover;" />
+}
+else
+{
+    <div class="bg-primary text-white d-flex
+                align-items-center justify-content-center"
+         style="height: 200px;">
+        <span class="fw-bold fs-4">RaceDay</span>
+    </div>
+}
 
                         <div class="card-body d-flex flex-column">
                             <div class="mb-2">

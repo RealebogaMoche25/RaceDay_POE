@@ -185,5 +185,40 @@ namespace RaceDay.Web.Controllers
         }
 
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadProfilePicture(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+            {
+                TempData["ErrorMessage"] = "Please select an image to upload.";
+                return RedirectToAction("MyProfile");
+            }
+
+            if (file.Length > 5 * 1024 * 1024)
+            {
+                TempData["ErrorMessage"] = "The image must not exceed 5 MB.";
+                return RedirectToAction("MyProfile");
+            }
+
+            try
+            {
+                await _apiService.UploadProfilePictureAsync(file);
+
+                TempData["SuccessMessage"] =
+                    "Your profile picture has been uploaded successfully.";
+
+                return RedirectToAction("MyProfile");
+            }
+            catch (HttpRequestException ex)
+            {
+                TempData["ErrorMessage"] =
+                    $"Unable to upload your profile picture: {ex.Message}";
+
+                return RedirectToAction("MyProfile");
+            }
+        }
+
+
     }
 }

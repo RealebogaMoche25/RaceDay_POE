@@ -20,5 +20,7 @@ namespace RaceDay.Web.ViewModels
         public string PhoneNumber { get; set; } = string.Empty;
 
         public string? ProfilePictureUrl { get; set; }
+
+        public string? ProfilePictureViewUrl { get; set; }
     }
 }

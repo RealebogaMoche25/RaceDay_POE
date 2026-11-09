@@ -15,17 +15,13 @@
     </a>
 
     <div class="card border-0 shadow-sm overflow-hidden">
-
-        @if (!string.IsNullOrWhiteSpace(raceEvent.BannerImageUrl)
-             && Uri.IsWellFormedUriString(raceEvent.BannerImageUrl, UriKind.Absolute)
-             && (raceEvent.BannerImageUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
-                 || raceEvent.BannerImageUrl.StartsWith("http://", StringComparison.OrdinalIgnoreCase)))
-        {
-            <img src="@raceEvent.BannerImageUrl"
-                 alt="Banner for @raceEvent.EventName"
-                 class="w-100"
-                 style="max-height: 350px; object-fit: cover;" />
-        }
+@if (!string.IsNullOrWhiteSpace(raceEvent.BannerImageViewUrl))
+{
+    <img src="@raceEvent.BannerImageViewUrl"
+         alt="Banner for @raceEvent.EventName"
+         class="w-100"
+         style="max-height: 350px; object-fit: cover;" />
+}
 
         <div class="card-body p-4 p-md-5">
 

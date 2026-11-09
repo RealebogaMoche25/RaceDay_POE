@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RACEDAY_API.Data;
 using RACEDAY_API.Models;
 using System.Security.Claims;
+using RACEDAY_API.Services;
 
 namespace RACEDAY_API.Controllers
 {
@@ -11,10 +12,14 @@ namespace RACEDAY_API.Controllers
     public class EventController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
+        private readonly AzureBlobStorageService _blobStorageService;
 
-        public EventController(ApplicationDBContext context)
+        public EventController(
+    ApplicationDBContext context,
+    AzureBlobStorageService blobStorageService)
         {
             _context = context;
+            _blobStorageService = blobStorageService;
         }
 
         /// <summary>
@@ -22,11 +27,41 @@ namespace RACEDAY_API.Controllers
         /// </summary>
         // GET: api/events
         // Anyone can view events
+        
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public IActionResult GetEvents()
         {
-            return Ok(_context.Events.ToList());
+            var events = _context.Events.ToList();
+
+            var eventResponses = events.Select(eventItem =>
+            {
+                string? bannerImageViewUrl = null;
+
+                if (!string.IsNullOrWhiteSpace(eventItem.BannerImageUrl))
+                {
+                    bannerImageViewUrl =
+                        _blobStorageService.GetImageReadUrl(
+                            eventItem.BannerImageUrl,
+                            "event-banners");
+                }
+
+                return new
+                {
+                    eventItem.EventId,
+                    eventItem.EventName,
+                    eventItem.EventDescription,
+                    eventItem.EventDate,
+                    eventItem.EventLocation,
+                    eventItem.EventDistance,
+                    eventItem.EventType,
+                    eventItem.BannerImageUrl,
+                    eventItem.OrganiserId,
+                    BannerImageViewUrl = bannerImageViewUrl
+                };
+            }).ToList();
+
+            return Ok(eventResponses);
         }
 
         /// <summary>
@@ -46,7 +81,29 @@ namespace RACEDAY_API.Controllers
                 return NotFound();
             }
 
-            return Ok(eventItem);
+            string? bannerImageViewUrl = null;
+
+            if (!string.IsNullOrWhiteSpace(eventItem.BannerImageUrl))
+            {
+                bannerImageViewUrl =
+                    _blobStorageService.GetImageReadUrl(
+                        eventItem.BannerImageUrl,
+                        "event-banners");
+            }
+
+            return Ok(new
+            {
+                eventItem.EventId,
+                eventItem.EventName,
+                eventItem.EventDescription,
+                eventItem.EventDate,
+                eventItem.EventLocation,
+                eventItem.EventDistance,
+                eventItem.EventType,
+                eventItem.BannerImageUrl,
+                eventItem.OrganiserId,
+                BannerImageViewUrl = bannerImageViewUrl
+            });
         }
 
         /// <summary>
@@ -126,6 +183,85 @@ namespace RACEDAY_API.Controllers
 
             return Ok(eventItem);
         }
+
+
+        /// <summary>
+        /// Uploads an event banner image to Azure Blob Storage.
+        /// Only the Organiser who owns the event can upload its banner.
+        /// </summary>
+        // POST: api/events/{id}/banner
+        [Authorize(Roles = "Organiser")]
+        [HttpPost("{id}/banner")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UploadEventBanner(
+            int id,
+            IFormFile file)
+        {
+            var eventItem = _context.Events.Find(id);
+
+            if (eventItem == null)
+            {
+                return NotFound("Event not found.");
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            int organiserId = int.Parse(userIdClaim.Value);
+
+            if (eventItem.OrganiserId != organiserId)
+            {
+                return Forbid();
+            }
+
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Please select an image.");
+            }
+
+            if (file.Length > 5 * 1024 * 1024)
+            {
+                return BadRequest("The image cannot exceed 5 MB.");
+            }
+
+            try
+            {
+                var imageUrl = await _blobStorageService.UploadImageAsync(
+                    file,
+                    "event-banners");
+
+                eventItem.BannerImageUrl = imageUrl;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Event banner uploaded successfully.",
+                    eventItem.EventId,
+                    eventItem.BannerImageUrl
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    "Unable to upload event banner. Please try again.");
+            }
+        }
+
 
         /// <summary>
         /// Deletes an existing event. Only the Organiser who owns the event can delete it.

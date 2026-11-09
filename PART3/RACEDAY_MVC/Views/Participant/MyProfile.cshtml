@@ -20,8 +20,60 @@
         </div>
     }
 
+    @if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
     <div class="card shadow-sm">
         <div class="card-body p-4">
+
+           <div class="text-center mb-4">
+
+    @if (!string.IsNullOrWhiteSpace(Model.ProfilePictureViewUrl))
+    {
+        <img src="@Model.ProfilePictureViewUrl"
+             alt="Profile picture"
+             class="rounded-circle shadow-sm"
+             style="width: 150px; height: 150px; object-fit: cover;" />
+    }
+    else
+    {
+        <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto shadow-sm"
+             style="width: 150px; height: 150px;">
+            <span class="text-muted">No photo</span>
+        </div>
+    }
+
+    <form asp-controller="Participant"
+          asp-action="UploadProfilePicture"
+          method="post"
+          enctype="multipart/form-data"
+          class="mt-3">
+
+        @Html.AntiForgeryToken()
+
+        <div class="mb-2">
+            <input type="file"
+                   name="file"
+                   class="form-control"
+                   accept=".jpg,.jpeg,.png,.webp"
+                   required />
+        </div>
+
+        <button type="submit" class="btn btn-outline-primary">
+            Upload Profile Picture
+        </button>
+
+        <p class="text-muted small mt-2">
+            Accepted formats: JPEG, PNG and WebP. Maximum size: 5 MB.
+        </p>
+
+    </form>
+
+</div>
 
             <form asp-controller="Participant"
                   asp-action="MyProfile"

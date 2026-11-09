@@ -545,5 +545,69 @@ namespace RaceDay.Web.Services
         }
 
 
+        // Upload the logged-in participant's profile picture
+        public async Task<bool> UploadProfilePictureAsync(IFormFile file)
+        {
+            var client = CreateApiClient();
+
+            using var content = new MultipartFormDataContent();
+
+            using var fileStream = file.OpenReadStream();
+
+            using var fileContent = new StreamContent(fileStream);
+
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue(file.ContentType);
+
+            content.Add(fileContent, "file", file.FileName);
+
+            var response = await client.PostAsync(
+                "api/users/me/profile-picture",
+                content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to upload profile picture. Status: {response.StatusCode}. {error}");
+            }
+
+            return true;
+        }
+
+
+        // Upload an event banner to Azure Blob Storage
+        public async Task<bool> UploadEventBannerAsync(int eventId, IFormFile file)
+        {
+            var client = CreateApiClient();
+
+            using var content = new MultipartFormDataContent();
+
+            using var fileStream = file.OpenReadStream();
+
+            using var fileContent = new StreamContent(fileStream);
+
+            fileContent.Headers.ContentType =
+                new MediaTypeHeaderValue(file.ContentType);
+
+            content.Add(fileContent, "file", file.FileName);
+
+            var response = await client.PostAsync(
+                $"api/events/{eventId}/banner",
+                content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var error = await response.Content.ReadAsStringAsync();
+
+                throw new HttpRequestException(
+                    $"Unable to upload event banner. Status: {response.StatusCode}. {error}");
+            }
+
+            return true;
+        }
+
+
     }
 }

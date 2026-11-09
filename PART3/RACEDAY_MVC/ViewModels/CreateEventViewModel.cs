@@ -26,5 +26,7 @@ namespace RaceDay.Web.ViewModels
         public string EventType { get; set; } = string.Empty;
 
         public string? BannerImageUrl { get; set; }
+
+        public string? BannerImageViewUrl { get; set; }
     }
 }

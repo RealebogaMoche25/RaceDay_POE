@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RACEDAY_API.Data;
 using RACEDAY_API.Models;
 using System.Security.Claims;
+using RACEDAY_API.Services;
 
 namespace RACEDAY_API.Controllers
 {
@@ -12,10 +13,14 @@ namespace RACEDAY_API.Controllers
     public class UserController : ControllerBase
     {
         private readonly ApplicationDBContext _context;
+        private readonly AzureBlobStorageService _blobStorageService;
 
-        public UserController(ApplicationDBContext context)
+        public UserController(
+    ApplicationDBContext context,
+    AzureBlobStorageService blobStorageService)
         {
             _context = context;
+            _blobStorageService = blobStorageService;
         }
 
         /// <summary>
@@ -44,6 +49,16 @@ namespace RACEDAY_API.Controllers
                 return NotFound("User not found.");
             }
 
+            string? profilePictureViewUrl = null;
+
+            if (!string.IsNullOrWhiteSpace(user.ProfilePictureUrl))
+            {
+                profilePictureViewUrl =
+                    _blobStorageService.GetImageReadUrl(
+                        user.ProfilePictureUrl,
+                        "profile-pictures");
+            }
+
             return Ok(new
             {
                 user.UserId,
@@ -52,7 +67,8 @@ namespace RACEDAY_API.Controllers
                 user.Email,
                 user.Role,
                 user.PhoneNumber,
-                user.ProfilePictureUrl
+                user.ProfilePictureUrl,
+                ProfilePictureViewUrl = profilePictureViewUrl
             });
         }
 
@@ -109,6 +125,76 @@ namespace RACEDAY_API.Controllers
                 user.ProfilePictureUrl
             });
         }
+
+
+        /// <summary>
+        /// Uploads a profile picture for the authenticated user.
+        /// </summary>
+        // POST: api/users/me/profile-picture
+        [HttpPost("me/profile-picture")]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UploadProfilePicture(
+           IFormFile file)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim == null)
+            {
+                return Unauthorized();
+            }
+
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Please select an image.");
+            }
+
+            if (file.Length > 5 * 1024 * 1024)
+            {
+                return BadRequest("The image cannot exceed 5 MB.");
+            }
+
+            int userId = int.Parse(userIdClaim.Value);
+
+            var user = _context.Users.Find(userId);
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            try
+            {
+                var imageUrl = await _blobStorageService.UploadImageAsync(
+                    file,
+                    "profile-pictures");
+
+                user.ProfilePictureUrl = imageUrl;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new
+                {
+                    message = "Profile picture uploaded successfully.",
+                    user.UserId,
+                    user.ProfilePictureUrl
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (Exception)
+            {
+                return StatusCode(
+                    StatusCodes.Status500InternalServerError,
+                    "Unable to upload profile picture. Please try again.");
+            }
+        }
+
 
         /// <summary>
         /// Retrieves basic participant details by user ID.
