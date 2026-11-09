@@ -1,0 +1,19 @@
+# Docker environment variables and secrets
+.env
+.env.*
+
+# Allow a safe example configuration file
+!.env.example
+
+# Visual Studio
+.vs/
+*.user
+*.suo
+
+# Build output
+**/bin/
+**/obj/
+
+# Sensitive local configuration
+secrets.json
+appsettings.Development.json
