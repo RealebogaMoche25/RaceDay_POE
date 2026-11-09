@@ -1,0 +1,21 @@
+﻿# Build output
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Git files
+.git/
+.gitignore
+
+# Sensitive configuration and secrets
+secrets.json
+appsettings.Development.json
+
+# Temporary files
+*.log
+*.tmp

@@ -1,0 +1,25 @@
+services:
+  api:
+    build:
+      context: ./PART2/RACEDAY_API
+      dockerfile: Dockerfile
+    container_name: raceday-api
+    ports:
+      - "5099:8080"
+    env_file:
+      - .env
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+  mvc:
+    build:
+      context: ./PART3/RACEDAY_MVC
+      dockerfile: Dockerfile
+    container_name: raceday-mvc
+    ports:
+      - "5098:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+      ApiSettings__BaseUrl: "http://api:8080/"
+    depends_on:
+      - api

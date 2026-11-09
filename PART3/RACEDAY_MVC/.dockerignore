@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+
+# Visual Studio files
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Git files
+.git/
+.gitignore
+
+# Temporary files
+*.log
+*.tmp
