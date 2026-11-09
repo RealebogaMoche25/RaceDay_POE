@@ -1,3 +1,4 @@
+
 name: RaceDay Repository CI
 
 on: [push, pull_request]
@@ -27,6 +28,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
+
+      - name: Build RaceDay MVC application
+        run: dotnet build PART3/RACEDAY_MVC/RaceDay.Web.csproj --configuration Release
 
       - name: Build RaceDay solution
         run: dotnet build RaceDay_POE.slnx --configuration Release
