@@ -625,9 +625,9 @@ A successful green build was completed using GitHub Actions.
 
 The screenshots below provide evidence of the successful build and automated test execution.
 
-<img width="1818" height="1020" alt="Workflow runs - successful GitHub Actions build" src="https://github.com/user-attachments/assets/0b4d0d7a-8652-4946-a0a8-e50051349c18" />
+<img width="1766" height="913" alt="Screenshot 2026-11-11 180810" src="https://github.com/user-attachments/assets/c47b2965-9c1e-436d-adfb-c19421573abd" />
+<img width="1733" height="945" alt="Screenshot 2026-11-11 180643" src="https://github.com/user-attachments/assets/f15b8dbf-0ede-4d19-8508-c8e335fb501c" />
 
-<img width="1822" height="1020" alt="Workflow runs - successful GitHub Actions build" src="https://github.com/user-attachments/assets/55f8d3e9-c653-454d-a785-174842a3073e" />
 
 The successful green build confirms that the RaceDay solution builds successfully and that the automated tests pass in GitHub Actions.
 
