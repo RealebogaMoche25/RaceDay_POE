@@ -10,4 +10,7 @@
   <Project Path="PART2/RACEDAY_API/RACEDAY_API.csproj">
     <BuildType Solution="Default|*" Project="Release" />
   </Project>
+  <Project Path="PART3/RACEDAY_MVC/RaceDay.Web.csproj" Id="21f129b4-9b55-42b7-b4df-54e6d75e6a37">
+    <BuildType Solution="Default|*" Project="Release" />
+  </Project>
 </Solution>

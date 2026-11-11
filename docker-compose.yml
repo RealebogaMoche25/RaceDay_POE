@@ -9,8 +9,7 @@ services:
     env_file:
       - .env
     environment:
-      ASPNETCORE_ENVIRONMENT: Production
-
+     ASPNETCORE_ENVIRONMENT: Development
   mvc:
     build:
       context: ./PART3/RACEDAY_MVC

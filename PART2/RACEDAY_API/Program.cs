@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.Services.AddScoped<RACEDAY_API.Services.AzureBlobStorageService>();
 
 // Add services to the container.
@@ -60,4 +61,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+app.Run(); 
