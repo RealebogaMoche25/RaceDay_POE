@@ -651,7 +651,7 @@ The Part 2 video demonstrates the RaceDay ASP.NET Core Web API, authentication a
 
 ### Part 3 YouTube Video
 
-**Video link to be added after recording.**
+https://youtu.be/9fPPbSlj5rg?feature=shared
 
 The Part 3 video will demonstrate:
 
